@@ -47,6 +47,7 @@ int endpoint_t::read(){
             _rb.expand();
         }
     }
+    _rb.readable(&data, &len);
     fprintf(stdout, "%d totally read:%s\n", _fd, data);
     return 0;
 }
