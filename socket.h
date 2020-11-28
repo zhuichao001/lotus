@@ -46,19 +46,6 @@ int set_unblocking(int fd, int on) {
     return ret;
 }
 
-int server_socket(const char *ip, const int port){
-    int svrfd = socket(AF_INET, SOCK_STREAM,0);
-    if (svrfd == -1) {
-        fprintf(stderr, "socket() failed, err:%d,%s\n", errno, strerror(errno));
-        return -1;
-    }
-    set_unblocking(svrfd, 1);
-    set_reuseaddr(svrfd, 1);
-    bind_address(svrfd, ip, port);
-    listen(svrfd, 128);
-    return svrfd;
-}
-
 int accept(int svrfd){
     struct sockaddr_in addr;
     socklen_t addrlen = sizeof(addr);

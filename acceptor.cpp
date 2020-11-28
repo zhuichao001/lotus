@@ -5,8 +5,13 @@
 #include "poll.h"
 
 int acceptor_t::open(){
-    _svrfd = server_socket(_ip, _port);
+    _svrfd = socket(AF_INET, SOCK_STREAM,0);
     assert(_svrfd>0);
+    set_unblocking(_svrfd, 1);
+    set_reuseaddr(_svrfd, 1);
+
+    bind_address(_svrfd, _ip, _port);
+    listen(_svrfd, BACK_LOG_SIZE);
     _ep->update(EPOLL_CTL_ADD, _svrfd, EPOLLIN | EPOLLET, this);
     return 0;
 }

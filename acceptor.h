@@ -22,6 +22,7 @@ public:
     int write();
     int svrfd(){return _svrfd;}
 private:
+    const int BACK_LOG_SIZE = 512;
     epoll_t *_ep;
     int _svrfd;
     const char *_ip;
