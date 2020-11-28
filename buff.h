@@ -4,54 +4,56 @@
 #include <stdlib.h>
 #include <memory.h>
 
+
 class buff_t {
-  public:
-    buff_t(int cap):_capacity(cap), _offset(0) ,_size(0){
-        _buff = new char[_capacity];
+public:
+    buff_t(int cap):_capacity(cap), _start(0), _end(0){
+        _buff = (char*)malloc(_capacity);
     }
 
     ~buff_t(){
         if(_buff!=NULL){
-            delete []_buff;
+            free(_buff);
         }
     }
 
-    void append(const char *data, const int len){
-        if(_size+len>_capacity){
-            _buff = (char*)realloc(_buff, _capacity<<1);
-        }
-        memcpy(_buff+_size, data, len);
-        _size += len;
+    void move(int left, int right){
+        _start += left;
+        _end += right;
     }
 
     void reset(){
-        delete []_buff;
-        _size = 0;
-        _offset = 0;
         _capacity = 0;
-    }
-
-    void clear(int n) {
-        if(_size-n>0){
-            memcpy(_buff, _buff+n, _size-n);
-        }
-        _size -= n;
-    }
-
-    int get(char **data, int *len){
-        *len = _capacity - _size - _offset;
-        *data =  _buff + _offset;
-        return 0;
+        _start = 0;
+        _end = 0;
     }
 
     bool empty(){
-        return _size==0;
+        return _start == _end;
     }
+
+    int writable(char **data, int *len){
+        *data =  _buff + _end;
+        *len = _capacity - _end;
+        return 0;
+    }
+
+    int readable(char **data, int *len){
+        *data =  _buff + _start;
+        *len = _end - _start;
+        return 0;
+    }
+
+    void expand(){
+        _capacity <<= 1;
+        _buff = (char*)realloc(_buff, _capacity);
+    }
+
 private:
     char *_buff;
     int _capacity;
-    int _size;    
-    int _offset;
+    int _start;
+    int _end;
 };
 
 #endif

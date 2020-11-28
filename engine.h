@@ -14,23 +14,23 @@
 #include <set>
 
 #include "poll.h"
-#include "acception.h"
+#include "acceptor.h"
 #include "server.h"
 
 using namespace std;
 
-const int MAX_CONN_NUMS    = 65536;
 
 
 class engine_t {
 public:
     engine_t(){
-        _ep = new epoll_t(1024);
+        _ep = new epoll_t(MAX_CONN_NUMS);
     }
     int start(const char *ip, const int port, server_t* svr);
     int run();
 private:
+    const int MAX_CONN_NUMS  = 1024;
     bool _stat; //running, closing, closed
-    map<int, acception_t*> _listeners;
+    map<int, acceptor_t*> _listeners;
     epoll_t *_ep;
 };

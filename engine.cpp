@@ -3,7 +3,7 @@
 
 
 int engine_t::start(const char *ip, const int port, server_t* svr) {
-    acception_t *ac = new acception_t(_ep, ip, port, svr);
+    acceptor_t *ac = new acceptor_t(_ep, ip, port, svr);
     ac->open();
     _listeners[ac->svrfd()] = ac;
     return 0;

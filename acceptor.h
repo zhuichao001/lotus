@@ -6,14 +6,15 @@
 #include <stdio.h>
 #include <errno.h>
 #include <assert.h>
-#include "io_handler.h"
+#include "iohandler.h"
 #include "buff.h"
 #include "poll.h"
 #include "server.h"
 
-class acception_t: public io_handler_t {
+class acceptor_t: public iohandler_t {
 public:
-    acception_t(epoll_t *ep, const char *ip, const int port, server_t *svr):_ep(ep), _ip(ip), _port(port), _svr(svr){
+    acceptor_t(epoll_t *ep, const char *ip, const int port, server_t *svr):
+        _ep(ep), _ip(ip), _port(port), _svr(svr){
     }
     int open();
     int close();

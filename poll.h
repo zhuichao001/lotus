@@ -15,7 +15,6 @@ public:
     int loop();
 private:
     int _efd;
-    //std:hash_map<int, connection_t*> _hub;
 };
 
 #endif

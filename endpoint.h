@@ -1,15 +1,16 @@
-#ifndef _NET_CONNECTION_H_
-#define _NET_CONNECTION_H_
+#ifndef _NET_ENDPOINT_H_
+#define _NET_ENDPOINT_H_
 
-#include "io_handler.h"
+#include "iohandler.h"
 #include "poll.h"
 #include "server.h"
 #include "buff.h"
 
 
-class connection_t: public io_handler_t {
+class endpoint_t: public iohandler_t {
 public:
-    connection_t(epoll_t *ep, int fd, server_t *svr):_ep(ep), _fd(fd), _svr(svr), _rb(2048), _wb(4096){
+    endpoint_t(epoll_t *ep, int fd, server_t *svr):
+        _ep(ep), _fd(fd), _svr(svr), _rb(2048), _wb(4096){
     }
     int open();
     int close();
