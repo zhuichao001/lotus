@@ -5,6 +5,7 @@
 #include "iohandler.h"
 #include "poll.h"
 
+
 void epoll_t::update(int op, int fd, int events, void *ptr)const{
     struct epoll_event ev;
     memset(&ev, 0, sizeof(ev));
@@ -17,12 +18,7 @@ int epoll_t::loop(){
     struct epoll_event events[1024];
     int n = epoll_wait(_efd, events, 1024, 100); //wait at most 100ms
     if(n==-1){
-        if(errno != EINTR){
-            fprintf(stderr, "epoll_wait error.\n");
-            return -1;
-        }
-        //signal_process(base);
-        return 0;
+        return -1;
     }
 
     for(int i=0; i<n; ++i){

@@ -23,30 +23,58 @@ public:
     }
 
     void reset(){
-        _capacity = 0;
         _start = 0;
         _end = 0;
+    }
+
+    void finish(int n){
+        _start += n;
     }
 
     bool empty(){
         return _start == _end;
     }
 
-    int writable(char **data, int *len){
+    char *data(){
+        return _buff + _start;
+    }
+
+    int len(){
+        return _end - _start;
+    }
+
+    int rest(char **data, int *len){
         *data =  _buff + _end;
         *len = _capacity - _end;
         return 0;
     }
 
-    int readable(char **data, int *len){
+    int used(char **data, int *len){
         *data =  _buff + _start;
         *len = _end - _start;
         return 0;
     }
 
+    int release(int n){
+        _start += n;
+    }
+
     void expand(){
         _capacity <<= 1;
         _buff = (char*)realloc(_buff, _capacity);
+    }
+
+
+    int append(char *data, int len){
+        if(data==nullptr || len<=0){
+            return -1;
+        }
+        if(len>_capacity-_end){
+            return -1;
+        }
+        memcpy(_buff+_end, data, len);
+        _end += len;
+        return len;
     }
 
 private:

@@ -14,15 +14,17 @@ public:
 
 class rpc_server_t: public server_t{
 public:
-    int process(request_t *req, response_t *res){
+    int process(request_t *req, response_t *rsp){
         printf("rpc server process.\n"); 
+        rsp->buf->append(req->data, req->len);
         return 0;
     }
 };
 
 class raft_server_t: public server_t{
 public:
-    int process(request_t *req, response_t *res){
+    int process(request_t *req, response_t *rsp){
+        printf("raft server process.\n"); 
         return 0;
     }
 };

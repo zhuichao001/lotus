@@ -20,11 +20,13 @@
 using namespace std;
 
 
-
 class engine_t {
 public:
     engine_t(){
         _ep = new epoll_t(MAX_CONN_NUMS);
+    }
+    ~engine_t(){
+        delete []_ep;
     }
     int start(const char *ip, const int port, server_t* svr);
     int run();
