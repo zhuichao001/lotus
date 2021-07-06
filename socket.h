@@ -23,4 +23,6 @@ int set_unblocking(int fd, int on);
 
 int accept(int svrfd);
 
+int connect(const char *ip, int port);
+
 #endif

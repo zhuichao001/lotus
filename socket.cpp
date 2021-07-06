@@ -1,6 +1,4 @@
-
 #include "socket.h"
-
 
 int bind_address(int fd, const char* ip, int port) {
     struct sockaddr_in servaddr;
@@ -44,5 +42,27 @@ int accept(int svrfd){
             return -1;
         }
     } 
+    return fd;
+}
+
+int connect(const char* ip, int port){
+    int fd = socket(AF_INET, SOCK_STREAM,0);
+    if(fd<0){
+        return -1;
+    }
+
+    struct sockaddr_in svr_addr;
+    svr_addr.sin_family = AF_INET; 
+    svr_addr.sin_port = htons(port); 
+    if (inet_pton(AF_INET, ip, &svr_addr.sin_addr)<=0){ 
+        printf("invalid address or address not supported.\n"); 
+        return -1; 
+    } 
+
+    if (connect(fd, (struct sockaddr *)&svr_addr, sizeof(svr_addr)) < 0) { 
+        printf("connection failed.\n"); 
+        return -1; 
+    } 
+
     return fd;
 }

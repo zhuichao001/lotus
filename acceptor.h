@@ -7,14 +7,15 @@
 #include <errno.h>
 #include <assert.h>
 #include "iohandler.h"
+#include "address.h"
 #include "buff.h"
 #include "poll.h"
 #include "server.h"
 
 class acceptor_t: public iohandler_t {
 public:
-    acceptor_t(epoll_t *ep, const char *ip, const int port, server_t *svr):
-        _ep(ep), _ip(ip), _port(port), _svr(svr){
+    acceptor_t(epoll_t *ep, const address_t *addr, server_t *svr):
+        _ep(ep), _addr(addr), _svr(svr){
     }
     int open();
     int close();
@@ -25,8 +26,7 @@ private:
     const int BACK_LOG_SIZE = 512;
     epoll_t *_ep;
     int _svrfd;
-    const char *_ip;
-    const int _port;
+    const address_t *_addr;
     server_t *_svr;
 };
 

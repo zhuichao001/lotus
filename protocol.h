@@ -14,6 +14,7 @@ public:
         return len;
     }
 
+    long long msgid;
     char *data;
     int len;
 };
@@ -32,6 +33,7 @@ public:
         return 0;
     }
 
+    long long msgid;
     buff_t *buf;
 };
 

@@ -10,7 +10,7 @@ int acceptor_t::open(){
     set_unblocking(_svrfd, 1);
     set_reuseaddr(_svrfd, 1);
 
-    bind_address(_svrfd, _ip, _port);
+    bind_address(_svrfd, _addr->ip, _addr->port);
     listen(_svrfd, BACK_LOG_SIZE);
     _ep->update(EPOLL_CTL_ADD, _svrfd, EPOLLIN | EPOLLET, this);
     return 0;
@@ -25,7 +25,7 @@ int acceptor_t::read() {
     if(fd<0){
         return -1;
     }
-    printf("%d accept client fd:%d\n", _svrfd, fd);
+    printf("%d accept client fd:%d.\n", _svrfd, fd);
     endpoint_t *h = new endpoint_t(_ep, fd, _svr);
     h->open();
     return 0;

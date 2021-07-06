@@ -1,5 +1,5 @@
-#ifndef _NET_ENGINE_H
-#define _NET_ENGINE_H
+#ifndef _NET_CARRIAGE_H
+#define _NET_CARRIAGE_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,29 +18,33 @@
 
 #include "address.h"
 #include "poll.h"
-#include "acceptor.h"
-#include "server.h"
+#include "protocol.h"
+#include "client.h"
 
 using namespace std;
 
 
-class engine_t {
+//as engine of client
+class carriage_t {
 public:
-    engine_t(){
+    carriage_t(){
         _ep = new epoll_t(MAX_CONN_NUMS);
     }
-
-    ~engine_t(){
+    ~carriage_t(){
         delete []_ep;
     }
+    void done(request_t *req, response_t *res){
+        fprintf(stderr, "call done\n");
+        return;
+    }
+    int start(const address_t *addr){
+        rpc_client_t *cli = new rpc_client_t(_ep, addr);
+        request_t req;
 
-    int start(const address_t *addr, server_t* svr){
-        acceptor_t *ac = new acceptor_t(_ep, addr, svr);
-        ac->open();
-        _listeners[ac->svrfd()] = ac;
+        using namespace std::placeholders;
+        cli->call(&req, std::bind(&carriage_t::done, this, _1, _2));
         return 0;
     }
-
     int run(){
         while (true) {
             _ep->loop();
@@ -49,7 +53,7 @@ public:
 private:
     const int MAX_CONN_NUMS  = 1024;
     bool _stat; //running, closing, closed
-    map<int, acceptor_t*> _listeners;
+    map<int, rpc_client_t*> _clients;
     epoll_t *_ep;
 };
 
