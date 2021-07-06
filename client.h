@@ -29,8 +29,7 @@ public:
         _sessions[req->msgid] = new session_t; 
         _sessions[req->msgid]->_req = req;
         _sessions[req->msgid]->_callback = callback;
-        //TODO
-        //data = encode(req);
+        //data = req.encode(req);
         //_point->write(data);
     }
 private:

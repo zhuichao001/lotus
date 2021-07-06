@@ -1,11 +1,15 @@
 #ifndef _NET_ADDRESS_H_
 #define _NET_ADDRESS_H_
+#include <string>
 
-typedef struct address_t {
-    const char *ip; 
-    const int port;
-    address_t(const char*s, int d):ip(s),port(d){
+class address_t {
+public:
+    address_t(const char*s, int d):
+        ip(s),
+        port(d){
     }
-} address_t;
+    const std::string ip; 
+    const int port;
+};
 
 #endif

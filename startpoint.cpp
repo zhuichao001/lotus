@@ -11,7 +11,7 @@
 
 
 int startpoint_t::open(){
-    _fd = connect(_addr->ip, _addr->port);
+    _fd = connect(_addr->ip.c_str(), _addr->port);
     assert(_fd>0);
 
     set_unblocking(_fd, 1);

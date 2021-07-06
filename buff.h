@@ -7,7 +7,10 @@
 
 class buff_t {
 public:
-    buff_t(int cap):_capacity(cap), _start(0), _end(0){
+    buff_t(int cap):
+        _capacity(cap), 
+        _start(0), 
+        _end(0){
         _buff = (char*)malloc(_capacity);
     }
 
@@ -63,7 +66,6 @@ public:
         _capacity <<= 1;
         _buff = (char*)realloc(_buff, _capacity);
     }
-
 
     int append(char *data, int len){
         if(data==nullptr || len<=0){
