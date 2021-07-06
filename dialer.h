@@ -25,26 +25,21 @@ using namespace std;
 
 
 //as engine of client
-class carriage_t {
+class dialer_t {
 public:
-    carriage_t(){
+    dialer_t(){
         _ep = new epoll_t(MAX_CONN_NUMS);
     }
-    ~carriage_t(){
+
+    ~dialer_t(){
         delete []_ep;
     }
-    void done(request_t *req, response_t *res){
-        fprintf(stderr, "call done\n");
-        return;
-    }
-    int start(const address_t *addr){
-        rpc_client_t *cli = new rpc_client_t(_ep, addr);
-        request_t req;
 
-        using namespace std::placeholders;
-        cli->call(&req, std::bind(&carriage_t::done, this, _1, _2));
-        return 0;
+    rpc_client_t * caller(const address_t *addr){
+        rpc_client_t *cli = new rpc_client_t(_ep, addr);
+        return cli;
     }
+
     int run(){
         while (true) {
             _ep->loop();
