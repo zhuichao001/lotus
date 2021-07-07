@@ -30,7 +30,7 @@ int iohandler_t::read(){
         }
     }
     _rb.used(&data, &len);
-    fprintf(stdout, "%d totally read:%s\n", _fd, data);
+    fprintf(stdout, "%d totally read:%d bytes\n", _fd, len);
     return 0;
 }
 
@@ -53,7 +53,7 @@ int iohandler_t::write(){
             fprintf(stderr,"client: write errno:%d.\n", errno);
             return -1;
         } else {
-            fprintf(stderr, "ok write: %s\n", data);
+            fprintf(stderr, "ok write: %d bytes\n", len);
             this->_wb.repay(n); //return space
         }
     }

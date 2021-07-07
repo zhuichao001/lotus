@@ -27,21 +27,24 @@ int endpoint_t::close(){
 }
 
 int endpoint_t::handle(){
-    fprintf(stderr, "handle is called.\n");
+    fprintf(stderr, "endpoint::handle is called.\n");
 
     request_t req;
     int n = req.decode(&_rb);
     if(n<0){
+        fprintf(stderr, "handle req.decode fialed.\n");
         return -1;
     }else if(n==0){
+        fprintf(stderr, "handle req.decode incomplete.\n");
         return 0;
     }else{
-        fprintf(stderr, "_rb.release.\n", errno);
+        fprintf(stderr, "handle req.decode %d bytes ok.\n", n);
         _rb.release(n);
     }
 
     response_t rsp;
     int result = _svr->process(&req, &rsp);
+
     buff_t buf(2048);
     rsp.encode(&buf);
     _wb.append(buf.data(), buf.len());

@@ -13,8 +13,8 @@ using namespace std;
 class rpc_client_t : public transport_t {
 public:
     rpc_client_t(epoll_t *ep, const address_t *addr):_addr(addr){
-        _io = new startpoint_t(ep, addr, &_sessions);
-        _io->open();
+        _ioh = new startpoint_t(ep, addr, &_sessions);
+        _ioh->open();
     }
 
     int call(request_t *req, std::function<int(request_t *, response_t *)> callback){
@@ -25,12 +25,14 @@ public:
 
         buff_t buf(1024);
         req->encode(&buf);
-        fprintf(stderr, "reqest encode:%s\n", buf.data());
-        _io->send(&buf);
+        fprintf(stderr, "request encode, len:%d\n", buf.len());
+        _ioh->send(&buf);
+        return 0;
     }
+
 private:
     const address_t *_addr;
-    startpoint_t *_io;
+    startpoint_t *_ioh;
     SessionMap _sessions;
 };
 

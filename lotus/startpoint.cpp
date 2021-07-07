@@ -39,11 +39,13 @@ int startpoint_t::handle(){
     response_t rsp;
     int n = rsp.decode(&_rb);
     if(n<0){
+        fprintf(stderr, "handle rsp.decode fialed.\n");
         return -1;
     }else if(n==0){
+        fprintf(stderr, "handle req.decode incomplete.\n");
         return 0;
     }else{
-        fprintf(stderr, "_rb.release.\n", errno);
+        fprintf(stderr, "handle rsp.decode %d bytes ok.\n", n);
         _rb.release(n);
     }
 

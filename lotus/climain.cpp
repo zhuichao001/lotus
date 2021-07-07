@@ -4,8 +4,8 @@
 #include "dialer.h"
 #include "server.h"
 
-int rpcdone(request_t *req, response_t *res){
-    fprintf(stderr, "call done\n");
+int rpcdone(request_t *req, response_t *rsp){
+    fprintf(stderr, "call done, response data:%s\n", rsp->data());
     return -1;
 }
 
@@ -20,6 +20,8 @@ int main(int argc, char *argv[]) {
     fprintf(stderr, "client [%s] boot up.\n", "127.0.0.1:8001");
 
     request_t req;
+    const char *s = "hello, world";
+    req.setbody(s, strlen(s)+1);
     cli->call(&req, rpcdone);
 
     th.join();
