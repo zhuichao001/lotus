@@ -12,10 +12,10 @@ public:
     }
     virtual ~iohandler_t() = default;
 
-    virtual int open(){ return 0; }
-    virtual int close(){ return 0; }
+    virtual int open() = 0;
+    virtual int close() = 0;
     virtual int read();
-    virtual int handle(){ return 0; } //unpack incoming data
+    virtual int handle() = 0; //unpack incoming data
 
     int write();
     int send(buff_t *);
