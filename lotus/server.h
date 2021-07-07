@@ -23,12 +23,4 @@ public:
     }
 };
 
-class raft_server_t: public server_t{
-public:
-    int process(request_t *req, response_t *rsp){
-        printf("raft server process.\n"); 
-        return 0;
-    }
-};
-
 #endif
