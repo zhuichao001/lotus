@@ -11,7 +11,7 @@ int acceptor_t::open(){
     set_reuseaddr(_svrfd, 1);
 
     bind_address(_svrfd, _addr->ip.c_str(), _addr->port);
-    listen(_svrfd, BACK_LOG_SIZE);
+    ::listen(_svrfd, BACK_LOG_SIZE);
     _ep->update(EPOLL_CTL_ADD, _svrfd, EPOLLIN | EPOLLET, this);
     return 0;
 }
