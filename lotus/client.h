@@ -13,21 +13,24 @@ using namespace std;
 class rpc_client_t : public transport_t {
 public:
     rpc_client_t(epoll_t *ep, const address_t *addr):_addr(addr){
-        _point = new startpoint_t(ep, addr, &_sessions);
-        _point->open();
+        _io = new startpoint_t(ep, addr, &_sessions);
+        _io->open();
     }
 
     int call(request_t *req, std::function<int(request_t *, response_t *)> callback){
-        req->msgid = get_nanosec(); //FIXME
-        _sessions[req->msgid] = new session_t; 
-        _sessions[req->msgid]->_req = req;
-        _sessions[req->msgid]->_callback = callback;
-        buff_t * data = req->encode();
-        _point->send(data);
+        int msgid = req->msgid();
+        _sessions[msgid] = new session_t; 
+        _sessions[msgid]->_req = req;
+        _sessions[msgid]->_callback = callback;
+
+        buff_t buf(1024);
+        req->encode(&buf);
+        fprintf(stderr, "reqest encode:%s\n", buf.data());
+        _io->send(&buf);
     }
 private:
     const address_t *_addr;
-    startpoint_t *_point;
+    startpoint_t *_io;
     SessionMap _sessions;
 };
 

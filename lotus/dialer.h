@@ -35,7 +35,7 @@ public:
         delete []_ep;
     }
 
-    rpc_client_t * caller(const address_t *addr){
+    rpc_client_t * newclient(const address_t *addr){
         rpc_client_t *cli = new rpc_client_t(_ep, addr);
         return cli;
     }

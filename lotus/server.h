@@ -14,7 +14,7 @@ class rpc_server_t: public server_t{
 public:
     int process(request_t *req, response_t *rsp){
         printf("rpc server process.\n"); 
-        rsp->buf->append(req->data, req->len);
+        rsp->write(req->data(), req->len());
         return 0;
     }
 };

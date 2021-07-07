@@ -47,7 +47,7 @@ int startpoint_t::handle(){
         _rb.release(n);
     }
 
-    uint64_t msgid = rsp.msgid;
+    uint64_t msgid = rsp.msgid();
     if(_sessions->find(msgid) == _sessions->end()){
         fprintf(stderr, "data msgid:%d not invalid", msgid);
         return -1;

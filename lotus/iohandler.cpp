@@ -8,7 +8,7 @@ int iohandler_t::read(){
     char *data = nullptr;
     int len = 0;
     while(true){
-        _rb.rest(&data, &len);
+        _rb.avaliable(&data, &len);
         int n = ::read(_fd, data, len);
         if(n<0 && errno==EAGAIN){// read done
             fprintf(stderr, "%d read again.\n", _fd);
@@ -21,7 +21,7 @@ int iohandler_t::read(){
             return -1;
         }
 
-        _rb.move(0, n);
+        _rb.expend(n);
         if(n<len){  //normal
             fprintf(stdout,"%d read done.\n", _fd);
             break;
@@ -47,12 +47,14 @@ int iohandler_t::write(){
 
         int n = ::write(_fd, (void *)data, (size_t)len);
         if (n<0 && errno == EAGAIN) { //tcp buffer is full
+            fprintf(stderr,"fd:%d write EAGAIN.\n", _fd);
             break;
         } else if (n<=0) { //error
             fprintf(stderr,"client: write errno:%d.\n", errno);
             return -1;
         } else {
-            this->_wb.finish(n);
+            fprintf(stderr, "ok write: %s\n", data);
+            this->_wb.repay(n); //return space
         }
     }
     return 0;

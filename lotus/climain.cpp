@@ -16,11 +16,11 @@ int main(int argc, char *argv[]) {
     });
 
     address_t addr((const char*)"127.0.0.1", 8001);
-    rpc_client_t *cli = dialer.caller(&addr);
+    rpc_client_t *cli = dialer.newclient(&addr);
+    fprintf(stderr, "client [%s] boot up.\n", "127.0.0.1:8001");
 
     request_t req;
     cli->call(&req, rpcdone);
-    fprintf(stderr, "client [%s] boot up.\n", "127.0.0.1:8001");
 
     th.join();
     return 0;

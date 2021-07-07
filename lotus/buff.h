@@ -20,18 +20,17 @@ public:
         }
     }
 
-    void move(int left, int right){
+    void repay(int left){
         _start += left;
+    }
+
+    void expend(int right){
         _end += right;
     }
 
     void reset(){
         _start = 0;
         _end = 0;
-    }
-
-    void finish(int n){
-        _start += n;
     }
 
     bool empty(){
@@ -46,8 +45,10 @@ public:
         return _end - _start;
     }
 
-    int rest(char **data, int *len){
-        *data =  _buff + _end;
+    int avaliable(char **data, int *len){
+        if(*data==nullptr){
+            *data =  _buff + _end;
+        }
         *len = _capacity - _end;
         return 0;
     }
@@ -67,7 +68,7 @@ public:
         _buff = (char*)realloc(_buff, _capacity);
     }
 
-    int append(char *data, int len){
+    int append(const char *data, int len){
         if(data==nullptr || len<=0){
             return -1;
         }
