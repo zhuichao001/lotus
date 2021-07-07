@@ -18,19 +18,16 @@ int acceptor_t::open(){
 
 int acceptor_t::close() {
     exit(-1);
+    return 0;
 }
 
 int acceptor_t::read() {
-    int fd = accept(_svrfd);
+    int fd = ::accept(_svrfd);
     if(fd<0){
         return -1;
     }
     printf("%d accept client fd:%d.\n", _svrfd, fd);
     endpoint_t *h = new endpoint_t(_ep, fd, _svr);
     h->open();
-    return 0;
-}
-
-int acceptor_t::write() {
     return 0;
 }

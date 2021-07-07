@@ -16,19 +16,19 @@ void epoll_t::update(int op, int fd, int events, void *ptr)const{
 
 int epoll_t::loop(){
     struct epoll_event events[1024];
-    int n = epoll_wait(_efd, events, 1024, 100); //wait at most 100ms
+    int n = epoll_wait(_efd, events, 1024, 1); //wait at most 1ms
     if(n==-1){
         return -1;
     }
 
     for(int i=0; i<n; ++i){
-        iohandler_t *h = (iohandler_t *)(events[i].data.ptr);
+        iohandler_t *h = static_cast<iohandler_t *>(events[i].data.ptr);
         if(events[i].events & EPOLLIN){
             if(h->read() < 0){
                 h->close();
                 delete h;
             }else{
-                h->handle();
+                pendings.push_back(h);
             }
         }
 
@@ -43,6 +43,12 @@ int epoll_t::loop(){
             (events[i].events & (EPOLLRDHUP|EPOLLHUP))){
             h->close();
         }
+    }
+
+    while(!pendings.empty()){
+        iohandler_t *h = pendings.front();
+        pendings.pop_front();
+        h->handle();
     }
 }
 

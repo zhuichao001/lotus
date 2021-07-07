@@ -10,18 +10,18 @@
 class endpoint_t: public iohandler_t {
 public:
     endpoint_t(epoll_t *ep, int fd, server_t *svr):
-        _ep(ep), _fd(fd), _svr(svr), _rb(2048), _wb(4096){
+        iohandler_t(fd),
+        _ep(ep), 
+        _svr(svr){
     }
+
+    ~endpoint_t() = default;
+
     int open();
     int close();
-    int read();
-    int write();
-    int handle();
+    int handle(); //for user call
+
 private:
-    int _efd;
-    int _fd;
-    buff_t _rb;
-    buff_t _wb;
     server_t *_svr;
     epoll_t *_ep;
 };

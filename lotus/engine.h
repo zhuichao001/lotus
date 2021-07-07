@@ -37,7 +37,7 @@ public:
     int start(const address_t *addr, server_t* svr){
         acceptor_t *ac = new acceptor_t(_ep, addr, svr);
         ac->open();
-        _listeners[ac->svrfd()] = ac;
+        _listeners[ac->listenfd()] = ac;
         return 0;
     }
 

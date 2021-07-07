@@ -6,7 +6,7 @@
 
 class transport_t {
 public:
-    virtual int call(request_t *req, std::function<void(request_t *, response_t *)> callback) = 0;
+    virtual int call(request_t *req, std::function<int(request_t *, response_t *)> callback) = 0;
     virtual ~transport_t(){
     }
 };

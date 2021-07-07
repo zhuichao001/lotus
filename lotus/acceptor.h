@@ -15,13 +15,17 @@
 class acceptor_t: public iohandler_t {
 public:
     acceptor_t(epoll_t *ep, const address_t *addr, server_t *svr):
-        _ep(ep), _addr(addr), _svr(svr){
+        iohandler_t(-1),
+        _ep(ep), 
+        _addr(addr), 
+        _svr(svr){
     }
     int open();
     int close();
     int read();
-    int write();
-    int svrfd(){return _svrfd;}
+    int handle(){return 0;}
+
+    int listenfd(){return _svrfd;}
 private:
     const int BACK_LOG_SIZE = 512;
     epoll_t *_ep;

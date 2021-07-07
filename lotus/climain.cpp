@@ -4,9 +4,9 @@
 #include "dialer.h"
 #include "server.h"
 
-void rpcdone(request_t *req, response_t *res){
+int rpcdone(request_t *req, response_t *res){
     fprintf(stderr, "call done\n");
-    return;
+    return -1;
 }
 
 int main(int argc, char *argv[]) {

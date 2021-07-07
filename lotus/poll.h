@@ -1,9 +1,11 @@
 #ifndef _NET_EPOLL_H_
 #define _NET_EPOLL_H_
 
+#include <list>
 #include <sys/epoll.h>
 #include <errno.h>
 #include <memory.h>
+#include "iohandler.h"
 
 class epoll_t {
 public:
@@ -15,6 +17,7 @@ public:
     int loop();
 private:
     int _efd;
+    std::list<iohandler_t*> pendings;
 };
 
 #endif

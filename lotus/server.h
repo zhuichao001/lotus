@@ -6,9 +6,7 @@
 
 class server_t {
 public:
-    virtual int process(request_t *req, response_t *res){
-        return 0;
-    }
+    virtual int process(request_t *req, response_t *rsp) = 0;
     virtual ~server_t(){}
 };
 

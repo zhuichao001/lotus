@@ -79,6 +79,10 @@ public:
         return len;
     }
 
+    int append(buff_t *b){
+        append(b->data(), b->len());
+    }
+
 private:
     char *_buff;
     int _capacity;
