@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
     rpc_client_t *cli = dialer.newclient(&addr);
     fprintf(stderr, "client [%s] boot up.\n", "127.0.0.1:8001");
 
-    for(int i=0; i<300; ++i){
+    for(int i=0; i<3000000; ++i){
         request_t req;
         const char *s = "test, 123, abc, @_@";
         req.setbody(s, strlen(s)+1);

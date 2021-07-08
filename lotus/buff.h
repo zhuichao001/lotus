@@ -1,6 +1,7 @@
 #ifndef _NET_BUFFER_H_
 #define _NET_BUFFER_H_
 
+#include <algorithm>
 #include <stdlib.h>
 #include <assert.h>
 #include <memory.h>
@@ -53,6 +54,10 @@ public:
         return _end - _start;
     }
 
+    int rest(){
+        return _capacity-len();
+    }
+
     int release(int n){
         _start += n;
     }
@@ -61,21 +66,28 @@ public:
         _end += right;
     }
 
-    void expand(){
-        _capacity <<= 1;
+    void expand(int size=1024){
+        _capacity += size;
         _buff = (char*)realloc(_buff, _capacity);
     }
 
-    int append(const char *data, int len){
-        if(data==nullptr || len<=0){
+    int append(const char *slice, int size){
+        if(slice==nullptr || size<=0){
             return -1;
         }
-        if(len>_capacity-_end){
-            expand(); //TODO 
+        int length = this->len();
+        if(size > _capacity-_end){
+            if(rest()>=size){
+                memcpy(_buff, _buff+_start, length);
+                _start = 0;
+                _end = length;
+            }else{
+                expand(std::max(size*2, _capacity/4));
+            }
         }
-        memcpy(_buff+_end, data, len);
-        _end += len;
-        return len;
+        memcpy(_buff+_end, slice, size);
+        _end += size;
+        return size;
     }
 
     int append(buff_t *b){

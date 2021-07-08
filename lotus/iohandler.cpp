@@ -11,7 +11,7 @@ int iohandler_t::read(){
         int len = 0;
         _rb.avaliable(&data, &len);
         if(len==0){
-            _rb.expand();
+            _rb.expand(2048);
             continue;
         }
 
