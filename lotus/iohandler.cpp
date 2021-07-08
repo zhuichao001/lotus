@@ -31,11 +31,11 @@ int iohandler_t::read(){
         total += n;
         _rb.expend(n);
         if(n<len){  //normal
-            fprintf(stdout,"%d read done.\n", _fd);
+            fprintf(stderr,"%d read done.\n", _fd);
             break;
         }
     }
-    fprintf(stdout, "%d totally read:%d bytes\n", _fd, total);
+    fprintf(stderr, "%d totally read:%d bytes\n", _fd, total);
     return 0;
 }
 
@@ -69,6 +69,6 @@ int iohandler_t::write(){
             break;
         }
     }
-    printf("return write\n");
+    fprintf(stderr, "return write\n");
     return 0;
 }

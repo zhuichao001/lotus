@@ -26,7 +26,7 @@ int acceptor_t::read() {
     if(cfd<0){
         return -1;
     }
-    printf("%d accept client fd:%d.\n", _fd, cfd);
+    fprintf(stderr, "%d accept client fd:%d.\n", _fd, cfd);
     endpoint_t *h = new endpoint_t(_ep, cfd, _svr);
     h->open();
     return 0;

@@ -78,12 +78,12 @@ int connect(const char* ip, int port){
     svr_addr.sin_family = AF_INET; 
     svr_addr.sin_port = htons(port); 
     if (inet_pton(AF_INET, ip, &svr_addr.sin_addr)<=0){ 
-        printf("invalid address or address not supported.\n"); 
+        fprintf(stderr, "invalid address or address not supported.\n"); 
         return -1; 
     } 
 
     if (connect(fd, (struct sockaddr *)&svr_addr, sizeof(svr_addr)) < 0) { 
-        printf("connection failed.\n"); 
+        fprintf(stderr, "connection failed.\n"); 
         return -1; 
     } 
 
