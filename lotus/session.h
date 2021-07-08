@@ -5,17 +5,18 @@
 #include <map>
 #include "protocol.h"
 
+typedef std::function<int(request_t *, response_t *)> RpcCallback;
+
 class session_t{
 public:
-    int done(response_t *rsp){
+    int reply(response_t *rsp){
         if(_callback){
             return _callback(_req, rsp);
         }
     }
 
     request_t *_req;
-
-    std::function<int(request_t *, response_t *)> _callback;
+    RpcCallback _callback;
 };
 
 typedef std::map<long long, session_t*> SessionMap;

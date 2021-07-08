@@ -17,8 +17,9 @@ public:
         _ioh->open();
     }
 
-    int call(request_t *req, std::function<int(request_t *, response_t *)> callback){
+    int call(request_t *req,  RpcCallback callback){
         int msgid = req->msgid();
+
         _sessions[msgid] = new session_t; 
         _sessions[msgid]->_req = req;
         _sessions[msgid]->_callback = callback;

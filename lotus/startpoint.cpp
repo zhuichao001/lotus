@@ -50,11 +50,16 @@ int startpoint_t::handle(){
     }
 
     uint64_t msgid = rsp.msgid();
-    if(_sessions->find(msgid) == _sessions->end()){
+    auto iter = _sessions->find(msgid);
+    if( iter == _sessions->end()){
         fprintf(stderr, "data msgid:%d not invalid", msgid);
         return -1;
     }
 
-    (*_sessions)[msgid]->done(&rsp);
+    iter->second->reply(&rsp);
+
+    delete iter->second;
+    _sessions->erase(msgid);
+
     return 1;
 }
