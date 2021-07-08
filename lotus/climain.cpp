@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
     });
 
     address_t addr((const char*)"127.0.0.1", 8001);
-    rpc_client_t *cli = dialer.newclient(&addr);
+    rpc_client_t *cli = dialer.open(&addr);
     fprintf(stderr, "client [%s] boot up.\n", "127.0.0.1:8001");
 
     for(int i=0; i<N; ++i){ //100w
