@@ -40,7 +40,9 @@ int endpoint_t::handle(){
     }else{
         fprintf(stderr, "handle req.decode %d bytes ok.\n", n);
         _rb.release(n);
+        fprintf(stderr, "after _rb release left %d bytes.\n", _rb.len());
     }
+
 
     response_t rsp;
     int result = _svr->process(&req, &rsp);
@@ -49,5 +51,5 @@ int endpoint_t::handle(){
     rsp.encode(&buf);
     _wb.append(buf.data(), buf.len());
     send(&buf);
-    return 0;
+    return 1;
 }

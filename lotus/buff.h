@@ -20,14 +20,6 @@ public:
         }
     }
 
-    void repay(int left){
-        _start += left;
-    }
-
-    void expend(int right){
-        _end += right;
-    }
-
     void reset(){
         _start = 0;
         _end = 0;
@@ -35,14 +27,6 @@ public:
 
     bool empty(){
         return _start == _end;
-    }
-
-    char *data(){
-        return _buff + _start;
-    }
-
-    int len(){
-        return _end - _start;
     }
 
     int avaliable(char **data, int *len){
@@ -53,14 +37,26 @@ public:
         return 0;
     }
 
-    int used(char **data, int *len){
+    int load(char **data, int *len){
         *data =  _buff + _start;
         *len = _end - _start;
         return 0;
     }
 
+    char *data(){
+        return _buff + _start;
+    }
+
+    int len(){
+        return _end - _start;
+    }
+
     int release(int n){
         _start += n;
+    }
+
+    void expend(int right){
+        _end += right;
     }
 
     void expand(){

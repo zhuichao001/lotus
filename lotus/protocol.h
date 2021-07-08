@@ -13,12 +13,14 @@ enum MESSAGE_TYPE{
     TYPE_HEARTBEAT
 };
 
+static int base_msgid=0;
+
 class message_t{
 public:
     message_t(MESSAGE_TYPE type, int size):
         _msgtype(type),
         _bodylen(0){
-        _msgid = 123; //FIXME
+        _msgid = ++base_msgid; //FIXME
         _body = new buff_t(size);
     }
     
@@ -62,9 +64,10 @@ public:
 
     int decode(buff_t *from){
         if(from->len()<13){
-            fprintf(stderr, "warning: buff from len is too less\n");
+            fprintf(stderr, "warning: buff len:%d is too less\n", from->len());
             return 0;
         }
+
         char *data = from->data();
         _msgtype = uint8_t(data[0]);
         fprintf(stderr, "_msgtype:%d\n", _msgtype);
@@ -83,7 +86,6 @@ public:
 
         _body->reset();
         _body->append(data+13, _bodylen);
-        from->repay(13+_bodylen);
         return 13+_bodylen;
     }
 

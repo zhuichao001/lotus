@@ -55,5 +55,5 @@ int startpoint_t::handle(){
         return -1;
     }
     (*_sessions)[msgid]->done(&rsp);
-    return 0;
+    return 1;
 }

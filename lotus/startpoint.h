@@ -25,7 +25,6 @@ public:
     int handle();
 
 private:
-    int _efd;
     epoll_t *_ep;
     const address_t *_addr;
     SessionMap *_sessions;

@@ -48,7 +48,10 @@ int epoll_t::loop(){
     while(!pendings.empty()){
         iohandler_t *h = pendings.front();
         pendings.pop_front();
-        h->handle();
+        int e = h->handle();
+        if(e>0){
+            pendings.push_back(h);
+        }
     }
 }
 

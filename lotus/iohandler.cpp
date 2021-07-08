@@ -9,6 +9,11 @@ int iohandler_t::read(){
     int len = 0;
     while(true){
         _rb.avaliable(&data, &len);
+        if(len==0){
+            _rb.expand();
+            continue;
+        }
+
         int n = ::read(_fd, data, len);
         if(n<0 && errno==EAGAIN){// read done
             fprintf(stderr, "%d read again.\n", _fd);
@@ -25,11 +30,8 @@ int iohandler_t::read(){
         if(n<len){  //normal
             fprintf(stdout,"%d read done.\n", _fd);
             break;
-        }else if(len-n==0){
-            _rb.expand();
         }
     }
-    _rb.used(&data, &len);
     fprintf(stdout, "%d totally read:%d bytes\n", _fd, len);
     return 0;
 }
@@ -43,7 +45,7 @@ int iohandler_t::write(){
     while(!_wb.empty()){
         char *data = nullptr;
         int len = 0;
-        _wb.used(&data, &len); 
+        _wb.load(&data, &len); 
 
         int n = ::write(_fd, (void *)data, (size_t)len);
         if (n<0 && errno == EAGAIN) { //tcp buffer is full
@@ -54,7 +56,7 @@ int iohandler_t::write(){
             return -1;
         } else {
             fprintf(stderr, "ok write: %d bytes\n", len);
-            this->_wb.repay(n); //return space
+            this->_wb.release(n); //return space
         }
     }
     return 0;
