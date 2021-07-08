@@ -56,6 +56,10 @@ public:
         return _body->len();
     }
 
+    uint64_t msgid(){
+        return _msgid;
+    }
+
     int decode(buff_t *from){
         if(from->len()<13){
             fprintf(stderr, "warning: buff from len is too less\n");
@@ -88,6 +92,7 @@ public:
         _bodylen += len;
     }
 
+private:
     uint8_t _msgtype;
     uint64_t _msgid;
     int32_t _bodylen;
@@ -121,9 +126,10 @@ public:
     }
 
     int msgid(){
-        return msg._msgid;
+        return msg.msgid();
     }
 
+private:
     message_t msg;
 };
 
@@ -143,7 +149,11 @@ public:
     }
 
     int setbody(const char *data, int len){
-        msg.write(data, len);
+        return msg.write(data, len);
+    }
+
+    void seterrcode(int err){
+        errcode = err;
     }
 
     const char * data(){
@@ -155,9 +165,10 @@ public:
     }
 
     int msgid(){
-        return msg._msgid;
+        return msg.msgid();
     }
 
+private:
     message_t msg;
     int errcode;
 };
