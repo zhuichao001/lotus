@@ -54,6 +54,7 @@ int startpoint_t::handle(){
         fprintf(stderr, "data msgid:%d not invalid", msgid);
         return -1;
     }
+
     (*_sessions)[msgid]->done(&rsp);
     return 1;
 }

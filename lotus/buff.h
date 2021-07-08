@@ -2,6 +2,7 @@
 #define _NET_BUFFER_H_
 
 #include <stdlib.h>
+#include <assert.h>
 #include <memory.h>
 
 
@@ -38,6 +39,7 @@ public:
     }
 
     int load(char **data, int *len){
+        assert(data!=nullptr);
         *data =  _buff + _start;
         *len = _end - _start;
         return 0;

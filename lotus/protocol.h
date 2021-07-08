@@ -104,7 +104,7 @@ private:
 class request_t{
 public:
     request_t():
-        msg(TYPE_REQUEST, 2048){
+        msg(TYPE_REQUEST, 128){
     }
 
     int encode(buff_t *b){
@@ -138,7 +138,7 @@ private:
 class response_t{
 public:
     response_t():
-        msg(TYPE_RESPONSE, 2048),
+        msg(TYPE_RESPONSE, 128),
         errcode(0){
     }
 

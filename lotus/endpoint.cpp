@@ -45,11 +45,16 @@ int endpoint_t::handle(){
 
 
     response_t rsp;
-    int result = _svr->process(&req, &rsp);
+    _svr->process(&req, &rsp);
 
-    buff_t buf(2048);
-    rsp.encode(&buf);
+    response(&rsp);
+    return 0;
+}
+
+int endpoint_t::response(response_t *rsp){
+    buff_t buf(1024);
+    rsp->encode(&buf);
     _wb.append(buf.data(), buf.len());
     send(&buf);
-    return 1;
+    return 0;
 }
