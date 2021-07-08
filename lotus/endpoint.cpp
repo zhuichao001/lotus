@@ -12,7 +12,7 @@
 
 int endpoint_t::open(){
     set_unblocking(_fd, 1);
-    _ep->update(EPOLL_CTL_ADD, _fd, EPOLLIN|EPOLLOUT, (void*)this);
+    _ep->update(EPOLL_CTL_ADD, _fd, EPOLLIN | EPOLLET, (void*)this);
     return 0;
 }
 
@@ -31,6 +31,8 @@ int endpoint_t::handle(){
 
     request_t req;
     int n = req.decode(&_rb);
+
+    int origlen = _rb.len();
     if(n<0){
         fprintf(stderr, "handle req.decode fialed.\n");
         return -1;
@@ -40,21 +42,22 @@ int endpoint_t::handle(){
     }else{
         fprintf(stderr, "handle req.decode %d bytes ok.\n", n);
         _rb.release(n);
-        fprintf(stderr, "after _rb release left %d bytes.\n", _rb.len());
+        fprintf(stderr, "_rb.len:%d after _rb release %d left %d bytes.\n", origlen, n, _rb.len());
     }
 
-
     response_t rsp;
-    _svr->process(&req, &rsp);
+    int err = _svr->process(&req, &rsp);
 
+    rsp.seterrcode(err);
+    rsp.setmsgid(req.msgid());
+    
     response(&rsp);
-    return 0;
+    return 1;
 }
 
 int endpoint_t::response(response_t *rsp){
     buff_t buf(1024);
     rsp->encode(&buf);
-    _wb.append(buf.data(), buf.len());
     send(&buf);
     return 0;
 }

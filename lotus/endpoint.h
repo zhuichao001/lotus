@@ -10,8 +10,7 @@
 class endpoint_t: public iohandler_t {
 public:
     endpoint_t(epoll_t *ep, int fd, server_t *svr):
-        iohandler_t(fd),
-        _ep(ep), 
+        iohandler_t(ep, fd),
         _svr(svr){
     }
 
@@ -24,7 +23,6 @@ public:
     int response(response_t *rsp);
 private:
     server_t *_svr;
-    epoll_t *_ep;
 };
 
 #endif

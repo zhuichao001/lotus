@@ -5,7 +5,8 @@
 #include <sys/epoll.h>
 #include <errno.h>
 #include <memory.h>
-#include "iohandler.h"
+
+class iohandler_t;
 
 class epoll_t {
 public:

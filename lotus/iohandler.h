@@ -1,11 +1,13 @@
 #ifndef _NET_IOHANDLER_H_
 #define _NET_IOHANDLER_H_
 
+#include "poll.h"
 #include "buff.h"
 
 class iohandler_t {
 public:
-    iohandler_t(int fd):
+    iohandler_t(epoll_t *ep, int fd):
+        _ep(ep),
         _fd(fd),
         _rb(2048), 
         _wb(4096){
@@ -18,10 +20,15 @@ public:
     virtual int read();
     virtual int handle() = 0; //unpack incoming data
 
-    int write();
     int send(buff_t *);
+    int write();
+
+    int fd(){
+        return _fd;
+    }
 
 protected:
+    epoll_t *_ep;
     int _fd;
     buff_t _rb;
     buff_t _wb;

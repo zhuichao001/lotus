@@ -71,7 +71,7 @@ public:
             return -1;
         }
         if(len>_capacity-_end){
-            return -1;
+            expand(); //TODO 
         }
         memcpy(_buff+_end, data, len);
         _end += len;

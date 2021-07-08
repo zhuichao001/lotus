@@ -27,15 +27,19 @@ int epoll_t::loop(){
             if(h->read() < 0){
                 h->close();
                 delete h;
+                continue;
             }else{
                 pendings.push_back(h);
             }
+            update(EPOLL_CTL_ADD, h->fd(), EPOLLOUT, (void*)h);
         }
 
         if(events[i].events & EPOLLOUT){
+            fprintf(stderr, "EPOLLOUT, fd:%d\n", h->fd());
             if(h->write()<0){
                 delete h;
                 h->close();
+                continue;
             }
         }
 
@@ -49,6 +53,7 @@ int epoll_t::loop(){
         iohandler_t *h = pendings.front();
         pendings.pop_front();
         int e = h->handle();
+        fprintf(stderr, "handle return :%d\n", e);
         if(e>0){
             pendings.push_back(h);
         }

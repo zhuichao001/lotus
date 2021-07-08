@@ -20,7 +20,6 @@ public:
     message_t(MESSAGE_TYPE type, int size):
         _msgtype(type),
         _bodylen(0){
-        _msgid = ++base_msgid; //FIXME
         _body = new buff_t(size);
     }
     
@@ -62,6 +61,10 @@ public:
         return _msgid;
     }
 
+    void setmsgid(uint64_t id){
+        _msgid = id;
+    }
+
     int decode(buff_t *from){
         if(from->len()<13){
             fprintf(stderr, "warning: buff len:%d is too less\n", from->len());
@@ -74,7 +77,7 @@ public:
 
         _msgid = 0;
         for(int i=0; i<8; ++i){
-            _msgid = (_msgid<<8) + int(data[8-i]);
+            _msgid = (_msgid<<8) + uint8_t(data[8-i]);
         }
         fprintf(stderr, "_msgid:%ld\n", _msgid);
 
@@ -105,6 +108,7 @@ class request_t{
 public:
     request_t():
         msg(TYPE_REQUEST, 128){
+        msg.setmsgid(++base_msgid);
     }
 
     int encode(buff_t *b){
@@ -117,6 +121,10 @@ public:
 
     int setbody(const char* body, int len){
         msg.write(body, len);
+    }
+
+    void setmsgid(uint64_t id){
+        msg.setmsgid(id);
     }
 
     const char * data(){
@@ -168,6 +176,10 @@ public:
 
     int msgid(){
         return msg.msgid();
+    }
+
+    void setmsgid(uint64_t id){
+        msg.setmsgid(id);
     }
 
 private:

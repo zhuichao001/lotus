@@ -12,8 +12,7 @@
 class startpoint_t: public iohandler_t {
 public:
     startpoint_t(epoll_t *ep, const address_t *addr, SessionMap *semap):
-        iohandler_t(-1),
-        _ep(ep), 
+        iohandler_t(ep, -1),
         _addr(addr), 
         _sessions(semap){
     }
@@ -25,7 +24,6 @@ public:
     int handle();
 
 private:
-    epoll_t *_ep;
     const address_t *_addr;
     SessionMap *_sessions;
 };
