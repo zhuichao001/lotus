@@ -83,7 +83,7 @@ public:
 
         _bodylen = 0;
         for(int i=0; i<4; ++i){
-            _bodylen = (_bodylen<<8) + int(data[12-i]);
+            _bodylen = (_bodylen<<8) + uint8_t(data[12-i]);
         }
         fprintf(stderr, "_bodylen:%d\n", _bodylen);
 
