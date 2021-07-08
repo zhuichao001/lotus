@@ -14,12 +14,14 @@ public:
 
     virtual int open() = 0;
     virtual int close() = 0;
+
     virtual int read();
     virtual int handle() = 0; //unpack incoming data
 
     int write();
     int send(buff_t *);
 
+protected:
     int _fd;
     buff_t _rb;
     buff_t _wb;
