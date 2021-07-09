@@ -16,7 +16,7 @@ int iohandler_t::read(){
         }
 
         int n = ::read(_fd, data, len);
-        fprintf(stderr, "------- fd:%d read in %d byptes\n", _fd, n);
+        fprintf(stderr, "fd:%d read in %d byptes\n", _fd, n);
         if(n<0 && errno==EAGAIN){// read done
             fprintf(stderr, "%d read again.\n", _fd);
             return 0;
@@ -43,6 +43,7 @@ int iohandler_t::send(buff_t *buff){
     _wb.append(buff);
     this->write();
     if(!_wb.empty()){
+        fprintf(stderr, "fd:%d regist EPOLLOUT with %d byptes\n", _fd, _wb.len());
         _ep->update(EPOLL_CTL_ADD, _fd, EPOLLOUT, (void*)this);
     }
     return 0;
@@ -55,7 +56,7 @@ int iohandler_t::write(){
         _wb.load(&data, &len); 
 
         int n = ::write(_fd, (void *)data, (size_t)len);
-        fprintf(stderr, "+++++++ fd:%d write out %d byptes\n", _fd, n);
+        fprintf(stderr, "fd:%d write out %d byptes\n", _fd, n);
         if (n<0 && errno == EAGAIN) { //tcp buffer is full
             fprintf(stderr,"fd:%d write EAGAIN.\n", _fd);
             return 0;

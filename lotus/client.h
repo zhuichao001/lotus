@@ -12,7 +12,8 @@ using namespace std;
 
 class rpc_client_t : public transport_t {
 public:
-    rpc_client_t(epoll_t *ep, const address_t *addr):_addr(addr){
+    rpc_client_t(epoll_t *ep, const address_t *addr):
+        _addr(addr){
         _ioh = new startpoint_t(ep, addr, &_sessions);
         _ioh->open();
     }
