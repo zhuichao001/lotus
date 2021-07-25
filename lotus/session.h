@@ -1,11 +1,8 @@
 #ifndef _LOTUS_SESSION_H_
 #define _LOTUS_SESSION_H_
 
-#include <functional>
 #include <map>
 #include "protocol.h"
-
-typedef std::function<int(request_t *, response_t *)> RpcCallback;
 
 class session_t{
 public:

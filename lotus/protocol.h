@@ -1,6 +1,7 @@
 #ifndef _NET_PROTOCOL_H_
 #define _NET_PROTOCOL_H_
 
+#include <functional>
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -186,5 +187,7 @@ private:
     message_t msg;
     int errcode;
 };
+
+typedef std::function<int(request_t *, response_t *)> RpcCallback;
 
 #endif

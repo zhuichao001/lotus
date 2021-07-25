@@ -27,7 +27,8 @@ using namespace std;
 
 class engine_t {
 public:
-    engine_t(){
+    engine_t(): 
+        _running(true){
         _ep = new epoll_t(MAX_CONN_NUMS);
     }
 
@@ -43,6 +44,10 @@ public:
         return 0;
     }
 
+    void stop(){
+        _running = false;
+    }
+
     //boot new client
     dialer_t * open(const address_t *addr){
         dialer_t *cli = new dialer_t(_ep, addr);
@@ -50,7 +55,7 @@ public:
     }
 
     int run(){
-        while (true) {
+        while (_running) {
             _ep->loop();
         }
     }
@@ -60,6 +65,7 @@ private:
     map<int, acceptor_t*> _listeners;
     map<int, dialer_t*> _clients;
     epoll_t *_ep;
+    bool _running;
 };
 
 #endif
