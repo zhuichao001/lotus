@@ -1,43 +1,41 @@
-#ifndef _NET_CARRIAGE_H
-#define _NET_CARRIAGE_H
+#ifndef _NET_DIALER_H_
+#define _NET_DIALER_H_
 
-#include <assert.h>
-#include <map>
-
+#include <ctime>
+#include "transport.h"
+#include "startpoint.h"
 #include "address.h"
-#include "poll.h"
-#include "protocol.h"
-#include "client.h"
+#include "session.h"
+#include "util.h"
 
 using namespace std;
 
-
-//as entrance api of client
-class dialer_t {
+class dialer_t : public transport_t {
 public:
-    dialer_t(){
-        _ep = new epoll_t(MAX_CONN_NUMS);
+    dialer_t(epoll_t *ep, const address_t *addr):
+        _addr(addr){
+        _ioh = new startpoint_t(ep, addr, &_sessions);
+        _ioh->open();
     }
 
-    ~dialer_t(){
-        delete []_ep;
+    int call(request_t *req,  RpcCallback callback){
+        int msgid = req->msgid();
+
+        _sessions[msgid] = new session_t; 
+        _sessions[msgid]->_req = req;
+        _sessions[msgid]->_callback = callback;
+
+        buff_t buf(1024);
+        req->encode(&buf);
+        fprintf(stderr, "request encode, len:%d\n", buf.len());
+        _ioh->send(&buf);
+        return 0;
     }
 
-    rpc_client_t * open(const address_t *addr){
-        rpc_client_t *cli = new rpc_client_t(_ep, addr);
-        return cli;
-    }
-
-    int run(){
-        while (true) {
-            _ep->loop();
-        }
-    }
 private:
-    const int MAX_CONN_NUMS  = 1024;
-    bool _stat; //running, closing, closed
-    map<int, rpc_client_t*> _clients;
-    epoll_t *_ep;
+    const address_t *_addr;
+    startpoint_t *_ioh;
+    SessionMap _sessions;
 };
 
 #endif

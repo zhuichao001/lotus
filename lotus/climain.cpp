@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <thread>
 #include "protocol.h"
+#include "engine.h"
 #include "dialer.h"
-#include "server.h"
 
 int rpcdone(request_t *req, response_t *rsp){
     fprintf(stderr, "call rpc done, response:[%s]\n", rsp->data());
@@ -18,13 +18,13 @@ int main(int argc, char *argv[]) {
 
     int N = atoi(argv[1]);
 
-    dialer_t dialer;
-    std::thread th([=, &dialer]{
-        dialer.run();
+    engine_t eng;
+    std::thread th([=, &eng]{
+        eng.run();
     });
 
     address_t addr((const char*)"127.0.0.1", 8001);
-    rpc_client_t *cli = dialer.open(&addr);
+    dialer_t *cli = eng.open(&addr);
     fprintf(stderr, "client [%s] boot up.\n", "127.0.0.1:8001");
 
     for(int i=0; i<N; ++i){ //100w

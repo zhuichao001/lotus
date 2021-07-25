@@ -20,6 +20,7 @@
 #include "poll.h"
 #include "acceptor.h"
 #include "server.h"
+#include "dialer.h"
 
 using namespace std;
 
@@ -34,11 +35,18 @@ public:
         delete []_ep;
     }
 
+    //boot new server
     int start(const address_t *addr, server_t* svr){
         acceptor_t *ac = new acceptor_t(_ep, addr, svr);
         ac->open();
         _listeners[ac->listenfd()] = ac;
         return 0;
+    }
+
+    //boot new client
+    dialer_t * open(const address_t *addr){
+        dialer_t *cli = new dialer_t(_ep, addr);
+        return cli;
     }
 
     int run(){
@@ -50,6 +58,7 @@ private:
     const int MAX_CONN_NUMS  = 1024;
     bool _stat; //running, closing, closed
     map<int, acceptor_t*> _listeners;
+    map<int, dialer_t*> _clients;
     epoll_t *_ep;
 };
 
