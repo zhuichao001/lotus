@@ -4,9 +4,9 @@
 
 class address_t {
 public:
-    address_t(const char*s, int d):
-        ip(s),
-        port(d){
+    address_t(const char*h, int p):
+        ip(h),
+        port(p){
     }
     const std::string ip; 
     const int port;
