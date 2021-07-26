@@ -10,12 +10,18 @@ public:
         port(p){
     }
 
+    address_t(std::string &host){
+        char tmp[32]={0,};
+        sscanf(host.c_str(), "%s:%d", tmp, &port);
+        ip = tmp;
+    }
+
     const std::string && to_string(){
         return std::move(ip+":"+std::to_string(port));
     }
 
-    const std::string ip; 
-    const int port;
+    std::string ip; 
+    int port;
 };
 
 #endif
