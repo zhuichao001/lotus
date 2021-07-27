@@ -1,13 +1,15 @@
+#include <stdio.h>
 #include "socket.h"
 
 int bind_address(int fd, const char* ip, int port) {
+    fprintf(stderr, "fd:%d bind address:[%s:%d]\n", fd, ip, port);
     struct sockaddr_in servaddr;
-    bzero(&servaddr,sizeof(servaddr));
+    bzero(&servaddr, sizeof(servaddr));
     servaddr.sin_family = AF_INET;
     inet_pton(AF_INET, ip, &servaddr.sin_addr);
     servaddr.sin_port = htons(port);
 
-    if (bind(fd,(struct sockaddr*)&servaddr,sizeof(servaddr)) == -1) {
+    if (bind(fd, (struct sockaddr*)&servaddr, sizeof(servaddr)) == -1) {
         perror("bind error: ");
         return -1;
     }
@@ -42,8 +44,7 @@ int set_unblocking(int fd, int on) {
 
 int set_keepalive(int fd, bool on){
     int opt = on ? 1 : 0;
-      ::setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE,
-                             &opt, static_cast<socklen_t>(sizeof opt));
+      ::setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &opt, static_cast<socklen_t>(sizeof opt));
     return 0;
 }
 
