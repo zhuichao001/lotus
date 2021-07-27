@@ -9,6 +9,7 @@ int acceptor_t::open(){
     assert(_fd>0);
     set_unblocking(_fd, 1);
     set_reuseaddr(_fd, 1);
+    fprintf(stderr, "fd:%d bind address:[%s:%d]\n", _fd, _addr->ip.c_str(), _addr->port);
 
     bind_address(_fd, _addr->ip.c_str(), _addr->port);
     ::listen(_fd, BACK_LOG_SIZE);
