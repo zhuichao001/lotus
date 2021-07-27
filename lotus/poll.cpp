@@ -24,7 +24,7 @@ int epoll_t::loop(){
     for(int i=0; i<n; ++i){
         iohandler_t *h = static_cast<iohandler_t *>(events[i].data.ptr);
         if(events[i].events & EPOLLIN){
-            if(h->read() < 0){
+            if(h->read() < 0){ //TODO
                 h->close();
                 delete h;
                 continue;

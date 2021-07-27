@@ -1,5 +1,5 @@
-#ifndef _NET_ENDPOINT_H_
-#define _NET_ENDPOINT_H_
+#ifndef _NET_STARTPOINT_H_
+#define _NET_STARTPOINT_H_
 
 #include "address.h"
 #include "iohandler.h"
@@ -17,12 +17,14 @@ public:
         _sessions(semap){
     }
 
-    ~startpoint_t() = default;
+    virtual ~startpoint_t() {
+    }
 
     int open();
-    int close();
-    int handle();
 
+    int close();
+
+    int handle();
 private:
     const address_t *_addr;
     SessionMap *_sessions;

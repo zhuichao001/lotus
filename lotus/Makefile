@@ -1,6 +1,10 @@
 all:
-	g++ -g -std=c++11 -o server buff.h poll.h iohandler.h engine.h protocol.h server.h util.cpp socket.cpp acceptor.cpp endpoint.cpp poll.cpp iohandler.cpp svrmain.cpp -pthread
-	g++ -g -std=c++11 -o client buff.h poll.h iohandler.h engine.h protocol.h dialer.h util.cpp socket.cpp startpoint.cpp poll.cpp iohandler.cpp climain.cpp -pthread
+	g++ -g -std=c++11 -c util.cpp socket.cpp acceptor.cpp startpoint.cpp endpoint.cpp poll.cpp iohandler.cpp
+	ar crv liblotus.a util.o socket.o acceptor.o startpoint.o endpoint.o poll.o iohandler.o
+	g++ -g -std=c++11 -o server svrmain.cpp -pthread -L. -llotus
+	g++ -g -std=c++11 -o client climain.cpp -pthread -L. -llotus
+	rm -f *.o
 clean:
+	rm -f *.o
 	rm -f server
 	rm -f client

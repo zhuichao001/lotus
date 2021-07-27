@@ -1,4 +1,6 @@
 client
 server
+*.o
+*.a
 *.out
 *.log

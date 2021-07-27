@@ -16,9 +16,8 @@ public:
 
     virtual int open() = 0;
     virtual int close() = 0;
-
+    virtual int handle() = 0; //deal incoming data
     virtual int read();
-    virtual int handle() = 0; //unpack incoming data
 
     int send(buff_t *);
     int write();

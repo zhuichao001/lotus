@@ -17,7 +17,9 @@ public:
     ~endpoint_t() = default;
 
     int open() override;
+
     int close() override;
+
     int handle() override; //for user call
 
     int response(response_t *rsp);

@@ -22,7 +22,7 @@ public:
     int open();
     int close();
     int read();
-    int handle(){return 0;}
+    int handle(){return 0;} //TODO
 
     int listenfd(){return _fd;}
 private:
