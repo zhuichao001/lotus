@@ -2,6 +2,7 @@
 #include "acceptor.h"
 #include "endpoint.h"
 #include "socket.h"
+#include "address.h"
 #include "poll.h"
 
 int acceptor_t::open(){
@@ -28,7 +29,10 @@ int acceptor_t::read() {
         return -1;
     }
     fprintf(stderr, "%d accept client fd:%d.\n", _fd, cfd);
-    endpoint_t *h = new endpoint_t(_ep, cfd, _svr);
+
+    address_t *addr = new address_t;
+    get_peer_ip_port(_fd, &(addr->ip), &(addr->port));
+    endpoint_t *h = new endpoint_t(_ep, cfd, addr, _svr);
     h->open();
     return 0;
 }

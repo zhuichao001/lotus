@@ -5,6 +5,8 @@
 
 class address_t {
 public:
+    address_t() = default;
+
     address_t(const char*h, int p):
         ip(h),
         port(p){

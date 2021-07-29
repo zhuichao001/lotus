@@ -4,27 +4,40 @@
 #include "iohandler.h"
 #include "poll.h"
 #include "server.h"
+#include "address.h"
 #include "buff.h"
+#include "socket.h"
+#include "endpoint.h"
 
 
 class endpoint_t: public iohandler_t {
 public:
-    endpoint_t(epoll_t *ep, int fd, server_t *svr):
-        iohandler_t(ep, fd),
-        _svr(svr){
+    endpoint_t(epoll_t *ep, int fd, const address_t *addr, server_t *svr):
+        iohandler_t(ep, fd), 
+        _addr(addr), 
+        _svr(svr),
+        _rb(2048), 
+        _wb(4096){
     }
 
-    ~endpoint_t() = default;
+    virtual ~endpoint_t() = default;
 
     int open() override;
 
     int close() override;
 
-    int handle() override; //for user call
+    int read() override;
 
-    int response(response_t *rsp);
+    int write() override;
+
+    int send(buff_t *buf);
 private:
+    int receive();
+
+    const address_t *_addr;
     server_t *_svr;
+    buff_t _rb;
+    buff_t _wb;
 };
 
 #endif

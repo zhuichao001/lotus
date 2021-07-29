@@ -7,6 +7,7 @@
 #include "socket.h"
 #include "protocol.h"
 #include "buff.h"
+#include "socket.h"
 #include "endpoint.h"
 
 
@@ -26,9 +27,13 @@ int endpoint_t::close(){
     return 0;
 }
 
-int endpoint_t::handle(){
-    fprintf(stderr, "endpoint::handle is called.\n");
+int endpoint_t::read(){
+    bread(_fd, &_rb);
+    _ep->post(std::bind(&endpoint_t::receive, this));
+    return 0;
+}
 
+int endpoint_t::receive(){
     request_t req;
     int n = req.decode(&_rb);
 
@@ -51,13 +56,25 @@ int endpoint_t::handle(){
     rsp.seterrcode(err);
     rsp.setmsgid(req.msgid());
     
-    response(&rsp);
+    buff_t buf(2048);
+    rsp.encode(&buf);
+    send(&buf);
     return 1;
 }
 
-int endpoint_t::response(response_t *rsp){
-    buff_t buf(1024);
-    rsp->encode(&buf);
-    send(&buf);
+int endpoint_t::send(buff_t *buf){
+    _wb.append(buf);
+    write();
+    return 0;
+}
+
+int endpoint_t::write(){
+    if(!_wb.empty()){
+        bwrite(_fd, &_wb);
+    }
+    if(!_wb.empty()){
+        fprintf(stderr, "fd:%d regist EPOLLOUT with %d byptes\n", _fd, _wb.len());
+        _ep->update(EPOLL_CTL_ADD, _fd, EPOLLOUT, (void*)this);
+    }
     return 0;
 }

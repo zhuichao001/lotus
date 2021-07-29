@@ -14,6 +14,10 @@ void epoll_t::update(int op, int fd, int events, void *ptr)const{
     epoll_ctl(_efd, op, fd, &ev);
 }
 
+void epoll_t::post(task_t t){
+    pendings.push_back(t);
+}
+
 int epoll_t::loop(){
     struct epoll_event events[1024];
     int n = epoll_wait(_efd, events, 1024, 1); //wait at most 1ms
@@ -24,14 +28,11 @@ int epoll_t::loop(){
     for(int i=0; i<n; ++i){
         iohandler_t *h = static_cast<iohandler_t *>(events[i].data.ptr);
         if(events[i].events & EPOLLIN){
-            if(h->read() < 0){ //TODO
+            if(h->read() < 0){ //TODO continously do until fail
                 h->close();
                 delete h;
                 continue;
-            }else{
-                pendings.push_back(h);
             }
-            update(EPOLL_CTL_ADD, h->fd(), EPOLLOUT, (void*)h);
         }
 
         if(events[i].events & EPOLLOUT){
@@ -50,12 +51,11 @@ int epoll_t::loop(){
     }
 
     while(!pendings.empty()){
-        iohandler_t *h = pendings.front();
+        task_t routine = pendings.front();
         pendings.pop_front();
-        int e = h->handle();
-        fprintf(stderr, "handle return :%d\n", e);
+        int e = routine();
         if(e>0){
-            pendings.push_back(h);
+            pendings.push_back(routine);
         }
     }
 }

@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <errno.h>
 #include "socket.h"
 
 int bind_address(int fd, const char* ip, int port) {
@@ -44,7 +46,7 @@ int set_unblocking(int fd, int on) {
 
 int set_keepalive(int fd, bool on){
     int opt = on ? 1 : 0;
-      ::setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &opt, static_cast<socklen_t>(sizeof opt));
+    ::setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, &opt, static_cast<socklen_t>(sizeof opt));
     return 0;
 }
 
@@ -89,6 +91,89 @@ int connect(const char* ip, int port){
     } 
 
     return fd;
+}
+
+int bread(int fd, buff_t *rb){
+    if(rb==nullptr){
+        return -1;
+    }
+    int total = 0;
+    while(true){
+        char *data = nullptr;
+        int len = 0;
+        rb->avaliable(&data, &len);
+        if(len==0){
+            rb->expand(2048);
+            continue;
+        }
+
+        int n = ::read(fd, data, len);
+        fprintf(stderr, "fd:%d read in %d byptes\n", fd, n);
+        if(n<0 && errno==EAGAIN){// read done
+            fprintf(stderr, "%d read again.\n", fd);
+            return 0;
+        }else if(n==0){   //conn closed
+            fprintf(stderr, "%d read closed.\n", fd);
+            return -1;
+        }else if(n<0){    //read error
+            fprintf(stderr, "%d read errno:%d.\n", fd, errno);
+            return -1;
+        }
+
+        total += n;
+        rb->expend(n);
+        if(n<len){  //normal
+            fprintf(stderr,"%d read done.\n", fd);
+            break;
+        }
+    }
+    fprintf(stderr, "%d totally read:%d bytes\n", fd, total);
+    return 0;
+}
+
+int bwrite(int fd, buff_t *wb){
+    if(wb==nullptr){
+        return -1;
+    }
+
+    while(!wb->empty()){
+        char *data = nullptr;
+        int len = 0;
+        wb->load(&data, &len);
+
+        int n = ::write(fd, (void *)data, (size_t)len);
+        fprintf(stderr, "fd:%d write out %d byptes\n", fd, n);
+        if (n<0 && errno == EAGAIN) { //tcp buffer is full
+            fprintf(stderr,"fd:%d write EAGAIN.\n", fd);
+            return 0;
+        } else if (n<=0) { //error
+            fprintf(stderr,"client: write errno:%d.\n", errno);
+            return -1;
+        } 
+
+        fprintf(stderr, "ok write: %d bytes\n", len);
+        wb->release(n); //return space
+        if(n<len){
+            break;
+        }
+    }
+    fprintf(stderr, "return write\n");
+    return 0;
+}
+
+void get_peer_ip_port(int fd, std::string *ip, int *port) {
+    struct sockaddr peer;
+    socklen_t peerlen = sizeof(peer);
+    getpeername(fd, (struct sockaddr *)&peer, &peerlen);
+
+    struct sockaddr_in *from = (struct sockaddr_in*)&peer;
+    struct in_addr in  = from->sin_addr;
+
+    char str[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET,&in, str, sizeof(str));
+
+    *ip = str;
+    *port = ntohs(from->sin_port);
 }
 
 int get_tcpinfo(int fd, struct tcp_info *info) {

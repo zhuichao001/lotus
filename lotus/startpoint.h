@@ -4,7 +4,6 @@
 #include "address.h"
 #include "iohandler.h"
 #include "poll.h"
-#include "server.h"
 #include "session.h"
 #include "buff.h"
 
@@ -12,22 +11,31 @@
 class startpoint_t: public iohandler_t {
 public:
     startpoint_t(epoll_t *ep, const address_t *addr, SessionMap *semap):
-        iohandler_t(ep, -1),
+        iohandler_t(ep, -1), 
         _addr(addr), 
-        _sessions(semap){
+        _sessions(semap),
+        _rb(2048), 
+        _wb(4096){
     }
 
-    virtual ~startpoint_t() {
-    }
+    virtual ~startpoint_t() = default;
 
-    int open();
+    int open() override;
 
-    int close();
+    int close() override;
 
-    int handle();
+    int read() override;
+
+    int write() override;
+
+    int send(buff_t *buf);
 private:
+    int receive();
+
     const address_t *_addr;
     SessionMap *_sessions;
+    buff_t _rb;
+    buff_t _wb;
 };
 
 #endif

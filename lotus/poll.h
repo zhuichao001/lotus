@@ -5,6 +5,7 @@
 #include <sys/epoll.h>
 #include <errno.h>
 #include <memory.h>
+#include "task.h"
 
 class iohandler_t;
 
@@ -15,10 +16,13 @@ public:
     }
 
     void update(int op, int fd, int events, void *ptr)const;
+
     int loop();
+
+    void post(task_t t);
 private:
     int _efd;
-    std::list<iohandler_t*> pendings;
+    std::list<task_t> pendings;
 };
 
 #endif

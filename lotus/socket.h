@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <errno.h>
+#include <string>
 #include <string.h>
 #include <sys/socket.h>
 #include <sys/select.h>
@@ -13,7 +14,7 @@
 #include <unistd.h>
 #include <assert.h>
 #include <sys/ioctl.h>
-
+#include "buff.h"
 
 int bind_address(int fd, const char* ip, int port);
 
@@ -30,6 +31,12 @@ int set_nodelay(int fd, bool on);
 int accept(int svrfd);
 
 int connect(const char *ip, int port);
+
+int bread(int fd, buff_t *rb);
+
+int bwrite(int fd, buff_t *wb);
+
+void get_peer_ip_port(int fd, std::string *ip, int *port);
 
 int get_tcpinfo(struct tcp_info *info);
 

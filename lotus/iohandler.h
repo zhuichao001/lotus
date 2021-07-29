@@ -8,29 +8,21 @@ class iohandler_t {
 public:
     iohandler_t(epoll_t *ep, int fd):
         _ep(ep),
-        _fd(fd),
-        _rb(2048), 
-        _wb(4096){
+        _fd(fd){
     }
     virtual ~iohandler_t() = default;
 
     virtual int open() = 0;
     virtual int close() = 0;
-    virtual int handle() = 0; //deal incoming data
-    virtual int read();
-
-    int send(buff_t *);
-    int write();
+    virtual int read() = 0;
+    virtual int write() = 0;
 
     int fd(){
         return _fd;
     }
-
 protected:
     epoll_t *_ep;
     int _fd;
-    buff_t _rb;
-    buff_t _wb;
 };
 
 #endif

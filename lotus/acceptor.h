@@ -18,13 +18,19 @@ public:
         iohandler_t(ep, -1),
         _addr(addr), 
         _svr(svr){
-        }
-    int open();
-    int close();
-    int read();
-    int handle(){return 0;} //TODO
+    }
 
-    int listenfd(){return _fd;}
+    virtual ~ acceptor_t() = default;
+
+    int open() override;
+
+    int close() override;
+
+    int read() override;
+
+    int write() {return 0;}
+
+    int listenfd() { return _fd; }
 private:
     const int BACK_LOG_SIZE = 512;
     const address_t *_addr;
