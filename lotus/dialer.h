@@ -12,7 +12,7 @@ using namespace std;
 
 class dialer_t : public transport_t {
 public:
-    dialer_t(epoll_t *ep, const address_t *addr):
+    dialer_t(evloop_t *ep, const address_t *addr):
         _addr(addr){
         _ioh = new startpoint_t(ep, addr, &_sessions);
         _ioh->open();

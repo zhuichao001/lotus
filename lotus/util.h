@@ -4,8 +4,8 @@
 #include <time.h>
 using namespace std;
 
-long long get_nanosec() ;
-long long get_millisec() ;
-long long get_microsec() ;
+long long nanosec() ;
+long long millisec() ;
+long long microsec() ;
 
 #endif

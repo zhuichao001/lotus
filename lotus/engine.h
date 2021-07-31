@@ -17,7 +17,7 @@
 #include <set>
 
 #include "address.h"
-#include "poll.h"
+#include "evloop.h"
 #include "acceptor.h"
 #include "server.h"
 #include "dialer.h"
@@ -29,7 +29,7 @@ class engine_t {
 public:
     engine_t(): 
         _running(true){
-        _ep = new epoll_t(MAX_CONN_NUMS);
+        _ep = new evloop_t(MAX_CONN_NUMS);
     }
 
     ~engine_t(){
@@ -64,7 +64,7 @@ private:
     bool _stat; //running, closing, closed
     map<int, acceptor_t*> _listeners;
     map<int, dialer_t*> _clients;
-    epoll_t *_ep;
+    evloop_t *_ep;
     bool _running;
 };
 

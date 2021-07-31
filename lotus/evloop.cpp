@@ -3,10 +3,17 @@
 #include <errno.h>
 #include <memory.h>
 #include "iohandler.h"
-#include "poll.h"
+#include "timer_tracker.h"
+#include "util.h"
+#include "evloop.h"
 
 
-void epoll_t::update(int op, int fd, int events, void *ptr)const{
+evloop_t::evloop_t(const int esize){
+    _efd = epoll_create(esize);
+    _tracker = new timer_tracker_t(this); 
+}
+
+void evloop_t::update(int op, int fd, int events, void *ptr)const{
     struct epoll_event ev;
     memset(&ev, 0, sizeof(ev));
     ev.events = events;
@@ -14,11 +21,11 @@ void epoll_t::update(int op, int fd, int events, void *ptr)const{
     epoll_ctl(_efd, op, fd, &ev);
 }
 
-void epoll_t::post(task_t t){
-    pendings.push_back(t);
+void evloop_t::post(task_t t){
+    _pendings.push_back(t);
 }
 
-int epoll_t::loop(){
+int evloop_t::loop(){
     struct epoll_event events[1024];
     int n = epoll_wait(_efd, events, 1024, 1); //wait at most 1ms
     if(n==-1){
@@ -47,13 +54,28 @@ int epoll_t::loop(){
         }
     }
 
-    while(!pendings.empty()){
-        task_t routine = pendings.front();
-        pendings.pop_front();
+    while(!_pendings.empty()){
+        task_t routine = _pendings.front();
+        _pendings.pop_front();
         int e = routine();
         if(e>0){
-            pendings.push_back(routine);
+            _pendings.push_back(routine);
         }
     }
 }
 
+
+int evloop_t::run_at(uint64_t when, timer_callback_t cb){
+    _tracker->add(cb, when, 0);
+    return 0;
+}
+
+int evloop_t::run_after(uint64_t delay, timer_callback_t cb){
+    _tracker->add(cb, microsec()+delay, 0);
+    return 0;
+}
+
+int evloop_t::run_every(uint64_t interval, timer_callback_t cb){
+    _tracker->add(cb, microsec(), interval);
+    return 0;
+}

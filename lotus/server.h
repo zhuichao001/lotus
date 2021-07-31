@@ -8,7 +8,7 @@
 class server_t {
 public:
     virtual int process(request_t *req, response_t *rsp) = 0;
-    virtual ~server_t(){}
+    virtual ~server_t() = default;
 };
 
 class rpc_server_t: public server_t{

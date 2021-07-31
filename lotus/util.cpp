@@ -1,18 +1,18 @@
 #include "util.h"
 
-long long get_nanosec() {
+long long nanosec() {
     struct timespec tn;
     clock_gettime(CLOCK_REALTIME, &tn);
     return tn.tv_nsec;
 }
 
-long long get_millisec() {
+long long millisec() {
     struct timespec tn;
     clock_gettime(CLOCK_REALTIME, &tn);
     return tn.tv_nsec / 1000000;
 }
 
-long long get_microsec() {
+long long microsec() {
     struct timespec tn;
     clock_gettime(CLOCK_REALTIME, &tn);
     return tn.tv_nsec / 1000;
