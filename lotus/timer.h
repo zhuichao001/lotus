@@ -16,7 +16,7 @@ public:
     }
 
     void run(){
-        if(!_canceled){
+        if(_canceled){
             return;
         }
         _callback();

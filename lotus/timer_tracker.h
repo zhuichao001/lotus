@@ -22,7 +22,7 @@ public:
     int write() override {return 0;}
 
 private:
-    int regist(uint64_t expireat);
+    int reset(uint64_t expireat);
 
     evloop_t *_ep;
     int _timerfd;

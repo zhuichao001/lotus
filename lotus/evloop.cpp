@@ -76,6 +76,6 @@ int evloop_t::run_after(uint64_t delay, timer_callback_t cb){
 }
 
 int evloop_t::run_every(uint64_t interval, timer_callback_t cb){
-    _tracker->add(cb, microsec(), interval);
+    _tracker->add(cb, microsec()+interval, interval);
     return 0;
 }

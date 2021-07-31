@@ -9,11 +9,11 @@ long long nanosec() {
 long long millisec() {
     struct timespec tn;
     clock_gettime(CLOCK_REALTIME, &tn);
-    return tn.tv_nsec / 1000000;
+    return tn.tv_sec*1000 + tn.tv_nsec / 1000000;
 }
 
 long long microsec() {
     struct timespec tn;
     clock_gettime(CLOCK_REALTIME, &tn);
-    return tn.tv_nsec / 1000;
+    return tn.tv_sec*1000000 +tn.tv_nsec / 1000;
 }

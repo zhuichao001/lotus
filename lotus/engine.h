@@ -36,11 +36,16 @@ public:
         delete []_ep;
     }
 
+    void print(){
+        fprintf(stderr, "test clock:%d\n", microsec());
+    }
+
     //boot new server
     int start(const address_t *addr, server_t* svr){
         acceptor_t *ac = new acceptor_t(_ep, addr, svr);
         ac->open();
         _listeners[ac->listenfd()] = ac;
+        _ep->run_every(1000*1000, std::bind(&engine_t::print, this));
         return 0;
     }
 
