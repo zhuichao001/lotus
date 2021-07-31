@@ -11,18 +11,21 @@
 class startpoint_t: public iohandler_t {
 public:
     startpoint_t(epoll_t *ep, const address_t *addr, SessionMap *semap):
-        iohandler_t(ep, -1), 
+        _ep(ep), 
+        _fd(-1),
         _addr(addr), 
         _sessions(semap),
         _rb(2048), 
         _wb(4096){
     }
 
-    virtual ~startpoint_t() = default;
+    ~startpoint_t() {
+        close();
+    }
 
-    int open() override;
+    int open();
 
-    int close() override;
+    int close();
 
     int read() override;
 
@@ -32,6 +35,8 @@ public:
 private:
     int receive();
 
+    epoll_t *_ep;
+    int _fd;
     const address_t *_addr;
     SessionMap *_sessions;
     buff_t _rb;

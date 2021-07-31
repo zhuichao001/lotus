@@ -13,18 +13,21 @@
 class endpoint_t: public iohandler_t {
 public:
     endpoint_t(epoll_t *ep, int fd, const address_t *addr, server_t *svr):
-        iohandler_t(ep, fd), 
+        _ep(ep), 
+        _fd(fd),
         _addr(addr), 
         _svr(svr),
         _rb(2048), 
         _wb(4096){
     }
 
-    virtual ~endpoint_t() = default;
+    ~endpoint_t(){
+        close();
+    }
 
-    int open() override;
+    int open();
 
-    int close() override;
+    int close();
 
     int read() override;
 
@@ -34,6 +37,8 @@ public:
 private:
     int receive();
 
+    epoll_t *_ep;
+    int _fd;
     const address_t *_addr;
     server_t *_svr;
     buff_t _rb;

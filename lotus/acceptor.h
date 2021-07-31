@@ -15,16 +15,19 @@
 class acceptor_t: public iohandler_t {
 public:
     acceptor_t(epoll_t *ep, const address_t *addr, server_t *svr):
-        iohandler_t(ep, -1),
+        _ep(ep),
+        _fd(-1),
         _addr(addr), 
         _svr(svr){
     }
 
-    virtual ~ acceptor_t() = default;
+    virtual ~ acceptor_t() {
+        close();
+    }
 
-    int open() override;
+    int open();
 
-    int close() override;
+    int close();
 
     int read() override;
 
@@ -33,6 +36,9 @@ public:
     int listenfd() { return _fd; }
 private:
     const int BACK_LOG_SIZE = 512;
+
+    epoll_t *_ep;
+    int _fd;
     const address_t *_addr;
     server_t *_svr;
 };

@@ -29,24 +29,21 @@ int epoll_t::loop(){
         iohandler_t *h = static_cast<iohandler_t *>(events[i].data.ptr);
         if(events[i].events & EPOLLIN){
             if(h->read() < 0){ //TODO continously do until fail
-                h->close();
                 delete h;
                 continue;
             }
         }
 
         if(events[i].events & EPOLLOUT){
-            fprintf(stderr, "EPOLLOUT, fd:%d\n", h->fd());
             if(h->write()<0){
                 delete h;
-                h->close();
                 continue;
             }
         }
 
         if((events[i].events & EPOLLERR) ||
             (events[i].events & (EPOLLRDHUP|EPOLLHUP))){
-            h->close();
+            delete h;
         }
     }
 
