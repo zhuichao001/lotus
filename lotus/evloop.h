@@ -17,11 +17,11 @@ public:
 
     int loop();
 
-    int run_at(uint64_t time_us, timer_callback_t cb) override;
+    lotus::timer_t *run_at(uint64_t time_us, timer_callback_t cb) override;
 
-    int run_after(uint64_t us, timer_callback_t cb) override;
+    lotus::timer_t *run_after(uint64_t us, timer_callback_t cb) override;
 
-    int run_every(uint64_t us, timer_callback_t cb) override;
+    lotus::timer_t *run_every(uint64_t us, timer_callback_t cb) override;
 
     void post(task_t t);
 private:
