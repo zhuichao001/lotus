@@ -64,6 +64,10 @@ public:
             _ep->loop();
         }
     }
+
+    evloop_t *evloop(){
+        return _ep;
+    }
 private:
     const int MAX_CONN_NUMS  = 1024;
     bool _stat; //running, closing, closed
