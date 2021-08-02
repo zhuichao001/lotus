@@ -5,10 +5,11 @@
 #include <sys/epoll.h>
 #include <errno.h>
 #include "types.h"
+#include "timedriver.h"
 
 class timer_tracker_t;
 
-class evloop_t {
+class evloop_t : public timedriver_t{
 public:
     evloop_t(const int esize);
 
@@ -16,11 +17,11 @@ public:
 
     int loop();
 
-    int run_at(uint64_t time_us, timer_callback_t cb);
+    int run_at(uint64_t time_us, timer_callback_t cb) override;
 
-    int run_after(uint64_t us, timer_callback_t cb);
+    int run_after(uint64_t us, timer_callback_t cb) override;
 
-    int run_every(uint64_t us, timer_callback_t cb);
+    int run_every(uint64_t us, timer_callback_t cb) override;
 
     void post(task_t t);
 private:
