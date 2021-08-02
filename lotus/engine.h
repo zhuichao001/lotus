@@ -37,7 +37,7 @@ public:
     }
 
     void print(){
-        fprintf(stderr, "test clock:%d\n", microsec());
+        fprintf(stderr, "test clock:%ld\n", microsec());
     }
 
     //boot new server
