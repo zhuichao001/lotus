@@ -13,20 +13,22 @@ class timer_tracker_t : public iohandler_t {
 public:
     timer_tracker_t(evloop_t *ep);
 
-    lotus::timer_t *add(timer_callback_t cb, uint64_t when, double interval);
+    lotus::timer_t *add(timer_callback_t cb, uint64_t when, uint64_t interval);
 
-    lotus::timer_t *cancel(lotus::timer_t *t);
+    lotus::timer_t *add(lotus::timer_t* t); 
+
+    int del(lotus::timer_t *t);
 
     int read() override;
 
     int write() override {return 0;}
 
 private:
-    int reset(uint64_t expireat);
+    int appoint(uint64_t expireat);
 
     evloop_t *_ep;
     int _timerfd;
-    std::set<lotus::timer_t *> _timers;
+    std::set<lotus::timer_t *, lotus::TimerCompare> _timers;
 };
 
 #endif

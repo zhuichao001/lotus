@@ -16,23 +16,32 @@ timer_tracker_t::timer_tracker_t(evloop_t *ep):
     _ep->update(EPOLL_CTL_ADD, _timerfd, EPOLLIN | EPOLLET, (void*)this);
 }
 
-lotus::timer_t *timer_tracker_t::add(timer_callback_t cb, uint64_t when, double interval) { 
-    lotus::timer_t* t = new lotus::timer_t(cb, when, interval);
+lotus::timer_t *timer_tracker_t::add(lotus::timer_t* t) { 
+    auto it = _timers.find(t);
+    if(it!=_timers.end()){
+        return *it;
+    }
+
     _timers.insert(t);
-    if(_timers.size()==1 || when<(*_timers.begin())->expireat()){
-        reset(when);
+    if(_timers.size()==1 || t->expireat() < (*_timers.begin())->expireat()){
+        appoint(t->expireat());
     }
     return t;
 }
 
-lotus::timer_t *timer_tracker_t::cancel(lotus::timer_t *t){
+lotus::timer_t *timer_tracker_t::add(timer_callback_t cb, uint64_t when, uint64_t interval) { 
+    lotus::timer_t* t = new lotus::timer_t(this, cb, when, interval);
+    return add(t);
+}
+
+int timer_tracker_t::del(lotus::timer_t *t){
     auto it = _timers.find(t);
     if(it==_timers.end()){
-        return nullptr;
-    }else{
-        (*it)->cancel();
+        return -1;
     }
-    return t;
+
+    _timers.erase(it);
+    return 0;
 }
 
 int timer_tracker_t::read(){
@@ -48,7 +57,7 @@ int timer_tracker_t::read(){
             break;
         }
 
-        (*it)->run();
+        (*it)->fired();
         if((*it)->repeatable()){
             futures.push_back((*it)->next());
         }
@@ -60,12 +69,12 @@ int timer_tracker_t::read(){
     }
 
     if(!_timers.empty()){
-        reset((*_timers.begin())->expireat());
+        appoint((*_timers.begin())->expireat());
     }
     return 0;
 }
 
-int timer_tracker_t::reset(uint64_t expireat){
+int timer_tracker_t::appoint(uint64_t expireat){
     struct itimerspec cur;
     memset(&cur, 0, sizeof cur);
     uint64_t after = expireat - microsec();
