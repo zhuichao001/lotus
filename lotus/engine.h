@@ -36,8 +36,8 @@ public:
         delete []_ep;
     }
 
-    void print(){
-        fprintf(stderr, "test clock:%ld\n", microsec());
+    void heartbeat(){
+        fprintf(stderr, "heartbeat clock:%ld\n", microsec());
     }
 
     //boot new server
@@ -45,7 +45,7 @@ public:
         acceptor_t *ac = new acceptor_t(_ep, addr, svr);
         ac->open();
         _listeners[ac->listenfd()] = ac;
-        _ep->run_every(1000*1000, std::bind(&engine_t::print, this));
+        _ep->run_every(std::bind(&engine_t::heartbeat, this), 1000*1000);
         return 0;
     }
 

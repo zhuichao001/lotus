@@ -4,7 +4,6 @@
 #include "socket.h"
 
 int bind_address(int fd, const char* ip, int port) {
-    fprintf(stderr, "fd:%d bind address:[%s:%d]\n", fd, ip, port);
     struct sockaddr_in servaddr;
     bzero(&servaddr, sizeof(servaddr));
     servaddr.sin_family = AF_INET;

@@ -65,14 +65,14 @@ int evloop_t::loop(){
 }
 
 
-lotus::timer_t *evloop_t::run_at(uint64_t when, timer_callback_t cb){
+lotus::timer_t *evloop_t::run_at(timer_callback_t cb, uint64_t when){
     return _tracker->add(cb, when, 0);
 }
 
-lotus::timer_t *evloop_t::run_after(uint64_t delay, timer_callback_t cb){
+lotus::timer_t *evloop_t::run_after(timer_callback_t cb, uint64_t delay){
     return _tracker->add(cb, microsec()+delay, 0);
 }
 
-lotus::timer_t *evloop_t::run_every(uint64_t interval, timer_callback_t cb){
+lotus::timer_t *evloop_t::run_every(timer_callback_t cb, uint64_t interval){
     return _tracker->add(cb, microsec()+interval, interval);
 }
