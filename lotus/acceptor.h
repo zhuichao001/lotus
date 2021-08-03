@@ -33,7 +33,7 @@ public:
 
     int write() {return 0;}
 
-    int listenfd() { return _fd; }
+    int fd() { return _fd; }
 private:
     const int BACK_LOG_SIZE = 512;
 

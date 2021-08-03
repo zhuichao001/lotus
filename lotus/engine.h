@@ -34,13 +34,13 @@ public:
 
     void heartbeat();
 
+    //boot new client
+    dialer_t * open(const address_t *addr);
+
     //boot new server
     int start(const address_t *addr, server_t* svr);
 
     void stop();
-
-    //boot new client
-    dialer_t * open(const address_t *addr);
 
     int run();
 

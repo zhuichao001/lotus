@@ -23,6 +23,8 @@ public:
         close();
     }
 
+    int fd(){return _fd;}
+
     int open();
 
     int close();
