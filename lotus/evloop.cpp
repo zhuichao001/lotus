@@ -10,7 +10,6 @@
 
 evloop_t::evloop_t(const int esize){
     _efd = epoll_create(esize);
-    _tracker = new timer_tracker_t(this); 
 }
 
 void evloop_t::update(int op, int fd, int events, void *ptr)const{
@@ -62,17 +61,4 @@ int evloop_t::loop(){
             _pendings.push_back(routine);
         }
     }
-}
-
-
-lotus::timer_t *evloop_t::run_at(timer_callback_t cb, uint64_t when){
-    return _tracker->add(cb, when, 0);
-}
-
-lotus::timer_t *evloop_t::run_after(timer_callback_t cb, uint64_t delay){
-    return _tracker->add(cb, microsec()+delay, 0);
-}
-
-lotus::timer_t *evloop_t::run_every(timer_callback_t cb, uint64_t interval){
-    return _tracker->add(cb, microsec()+interval, interval);
 }

@@ -9,7 +9,7 @@
 
 class timer_tracker_t;
 
-class evloop_t : public timedriver_t{
+class evloop_t {
 public:
     evloop_t(const int esize);
 
@@ -17,16 +17,9 @@ public:
 
     int loop();
 
-    lotus::timer_t *run_at(timer_callback_t cb, uint64_t time_us) override;
-
-    lotus::timer_t *run_after(timer_callback_t cb, uint64_t us) override;
-
-    lotus::timer_t *run_every(timer_callback_t cb, uint64_t us) override;
-
     void post(task_t t);
 private:
     int _efd;
-    timer_tracker_t *_tracker;
     std::list<task_t> _pendings;
 };
 

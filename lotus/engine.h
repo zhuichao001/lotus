@@ -21,59 +21,41 @@
 #include "acceptor.h"
 #include "server.h"
 #include "dialer.h"
+#include "timer.h"
+#include "timer_tracker.h"
 
-using namespace std;
+const int MAX_CONN_NUMS  = 1024;
 
-
-class engine_t {
+class engine_t : public timedriver_t{
 public:
-    engine_t(): 
-        _running(true){
-        _ep = new evloop_t(MAX_CONN_NUMS);
-    }
+    engine_t();
 
-    ~engine_t(){
-        delete []_ep;
-    }
+    ~engine_t();
 
-    void heartbeat(){
-        fprintf(stderr, "heartbeat clock:%ld\n", microsec());
-    }
+    void heartbeat();
 
     //boot new server
-    int start(const address_t *addr, server_t* svr){
-        acceptor_t *ac = new acceptor_t(_ep, addr, svr);
-        ac->open();
-        _listeners[ac->listenfd()] = ac;
-        _ep->run_every(std::bind(&engine_t::heartbeat, this), 1000*1000);
-        return 0;
-    }
+    int start(const address_t *addr, server_t* svr);
 
-    void stop(){
-        _running = false;
-    }
+    void stop();
 
     //boot new client
-    dialer_t * open(const address_t *addr){
-        dialer_t *cli = new dialer_t(_ep, addr);
-        return cli;
-    }
+    dialer_t * open(const address_t *addr);
 
-    int run(){
-        while (_running) {
-            _ep->loop();
-        }
-    }
+    int run();
 
-    evloop_t *evloop(){
-        return _ep;
-    }
+    lotus::timer_t *run_at(timer_callback_t cb, uint64_t when) override;
+
+    lotus::timer_t *run_after(timer_callback_t cb, uint64_t delay) override;
+    
+    lotus::timer_t *run_every(timer_callback_t cb, uint64_t interval) override;
+
 private:
-    const int MAX_CONN_NUMS  = 1024;
     bool _stat; //running, closing, closed
-    map<int, acceptor_t*> _listeners;
-    map<int, dialer_t*> _clients;
+    std::map<int, acceptor_t*> _listeners;
+    std::map<int, dialer_t*> _clients;
     evloop_t *_ep;
+    timer_tracker_t *_tracker;
     bool _running;
 };
 
