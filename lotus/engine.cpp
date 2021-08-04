@@ -28,7 +28,7 @@ int engine_t::start(const address_t *addr, server_t* svr){
     _listeners[ac->fd()] = ac;
     
     //TODO DELETE
-    run_every(std::bind(&engine_t::heartbeat, this), 1000*1000);
+    //run_every(std::bind(&engine_t::heartbeat, this), 1000*1000);
     return 0;
 }
 

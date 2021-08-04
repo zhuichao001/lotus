@@ -31,7 +31,7 @@ public:
 
     int read() override;
 
-    int write() {return 0;}
+    int write() override {return 0;}
 
     int fd() { return _fd; }
 private:

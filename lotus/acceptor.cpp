@@ -8,6 +8,7 @@
 int acceptor_t::open(){
     _fd = socket(AF_INET, SOCK_STREAM,0);
     assert(_fd>0);
+
     set_unblocking(_fd, 1);
     set_reuseaddr(_fd, 1);
     fprintf(stderr, "fd:%d bind address:[%s:%d]\n", _fd, _addr->ip.c_str(), _addr->port);
