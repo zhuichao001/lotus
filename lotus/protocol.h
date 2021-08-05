@@ -74,19 +74,16 @@ public:
 
         char *data = from->data();
         _msgtype = uint8_t(data[0]);
-        fprintf(stderr, "_msgtype:%d\n", _msgtype);
 
         _msgid = 0;
         for(int i=0; i<8; ++i){
             _msgid = (_msgid<<8) + uint8_t(data[8-i]);
         }
-        fprintf(stderr, "_msgid:%ld\n", _msgid);
 
         _bodylen = 0;
         for(int i=0; i<4; ++i){
             _bodylen = (_bodylen<<8) + uint8_t(data[12-i]);
         }
-        fprintf(stderr, "_bodylen:%d\n", _bodylen);
 
         _body->reset();
         _body->append(data+13, _bodylen);
