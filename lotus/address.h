@@ -27,6 +27,19 @@ public:
         return std::move(ip+":"+std::to_string(port));
     }
 
+    const uint64_t to_long()const{
+        uint64_t ret = 0;
+        for (int i = 0; i < ip.length(); i++) {
+            if(ip[i]=='.'){
+                continue;
+            }
+            ret = ret*10+(ip[i]-'0');
+        }
+        ret *= 100000;
+        ret += port;
+        return ret;
+    }
+
     std::string ip; 
     int port;
 };
