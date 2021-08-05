@@ -22,7 +22,7 @@
 #include "server.h"
 #include "dialer.h"
 #include "timer.h"
-#include "timer_tracker.h"
+#include "timetracker.h"
 
 const int MAX_CONN_NUMS  = 1024;
 
@@ -55,7 +55,7 @@ private:
     std::map<int, acceptor_t*> _listeners;
     std::map<int, dialer_t*> _clients;
     evloop_t *_ep;
-    timer_tracker_t *_tracker;
+    timetracker_t *_tracker;
     bool _running;
 };
 

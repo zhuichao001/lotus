@@ -9,9 +9,9 @@
 
 class evloop_t;
 
-class timer_tracker_t : public iohandler_t {
+class timetracker_t : public iohandler_t {
 public:
-    timer_tracker_t(evloop_t *ep);
+    timetracker_t(evloop_t *ep);
 
     lotus::timer_t *add(timer_callback_t cb, uint64_t when, uint64_t interval);
 

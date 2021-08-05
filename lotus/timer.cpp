@@ -1,9 +1,9 @@
 #include "timer.h"
-#include "timer_tracker.h"
+#include "timetracker.h"
 
 namespace lotus {
 
-timer_t::timer_t(timer_tracker_t* trac, timer_callback_t cb, uint64_t when, uint64_t interval):
+timer_t::timer_t(timetracker_t* trac, timer_callback_t cb, uint64_t when, uint64_t interval):
     _tracker(trac),
     _callback(cb),
     _expire(when),

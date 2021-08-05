@@ -7,7 +7,7 @@
 #include "types.h"
 #include "timedriver.h"
 
-class timer_tracker_t;
+class timetracker_t;
 
 class evloop_t {
 public:

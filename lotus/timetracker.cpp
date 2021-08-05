@@ -7,16 +7,16 @@
 #include <unistd.h>
 #include "util.h"
 #include "evloop.h"
-#include "timer_tracker.h"
+#include "timetracker.h"
 
-timer_tracker_t::timer_tracker_t(evloop_t *ep):
+timetracker_t::timetracker_t(evloop_t *ep):
     _ep(ep){
     _timerfd = ::timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK | TFD_CLOEXEC);
     assert(_timerfd>0);
     _ep->update(EPOLL_CTL_ADD, _timerfd, EPOLLIN | EPOLLET, (void*)this);
 }
 
-lotus::timer_t *timer_tracker_t::add(lotus::timer_t* t) { 
+lotus::timer_t *timetracker_t::add(lotus::timer_t* t) { 
     auto it = _timers.find(t);
     if(it!=_timers.end()){
         return *it;
@@ -29,12 +29,12 @@ lotus::timer_t *timer_tracker_t::add(lotus::timer_t* t) {
     return t;
 }
 
-lotus::timer_t *timer_tracker_t::add(timer_callback_t cb, uint64_t when, uint64_t interval) { 
+lotus::timer_t *timetracker_t::add(timer_callback_t cb, uint64_t when, uint64_t interval) { 
     lotus::timer_t* t = new lotus::timer_t(this, cb, when, interval);
     return add(t);
 }
 
-int timer_tracker_t::del(lotus::timer_t *t){
+int timetracker_t::del(lotus::timer_t *t){
     auto it = _timers.find(t);
     if(it==_timers.end()){
         return -1;
@@ -44,7 +44,7 @@ int timer_tracker_t::del(lotus::timer_t *t){
     return 0;
 }
 
-int timer_tracker_t::read(){
+int timetracker_t::read(){
     uint64_t howmany;
     ssize_t n = ::read(_timerfd, &howmany, sizeof howmany);
     uint64_t now = microsec();
@@ -74,7 +74,7 @@ int timer_tracker_t::read(){
     return 0;
 }
 
-int timer_tracker_t::appoint(uint64_t expireat){
+int timetracker_t::appoint(uint64_t expireat){
     struct itimerspec cur;
     memset(&cur, 0, sizeof cur);
     uint64_t after = expireat - microsec();

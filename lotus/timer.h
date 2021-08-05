@@ -3,13 +3,13 @@
 
 #include "types.h"
 
-class timer_tracker_t;
+class timetracker_t;
 
 namespace lotus {
 
 class timer_t {
 public:
-    timer_t(timer_tracker_t* trac, timer_callback_t cb, uint64_t when, uint64_t interval);
+    timer_t(timetracker_t* trac, timer_callback_t cb, uint64_t when, uint64_t interval);
 
     void fired();
 
@@ -24,7 +24,7 @@ public:
     int update(uint64_t expireat);
 
 private:
-    timer_tracker_t* _tracker;
+    timetracker_t* _tracker;
     const timer_callback_t _callback;
     uint64_t _expire;
     uint64_t _interval;
