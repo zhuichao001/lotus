@@ -23,7 +23,7 @@ public:
         ip = tmp;
     }
 
-    const std::string && to_string(){
+    const std::string && to_string()const{
         return std::move(ip+":"+std::to_string(port));
     }
 
