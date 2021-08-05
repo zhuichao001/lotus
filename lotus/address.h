@@ -12,6 +12,11 @@ public:
         port(p){
     }
 
+    address_t(const address_t &addr){
+        ip = addr.ip;
+        port = addr.port;
+    }
+
     address_t(std::string &host){
         char tmp[32]={0,};
         sscanf(host.c_str(), "%s:%d", tmp, &port);
