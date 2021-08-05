@@ -39,15 +39,15 @@ int endpoint_t::receive(){
 
     int origlen = _rb.len();
     if(n<0){
-        fprintf(stderr, "handle req.decode fialed.\n");
+        //fprintf(stderr, "handle req.decode fialed.\n");
         return -1;
     }else if(n==0){
-        fprintf(stderr, "handle req.decode incomplete.\n");
+        //fprintf(stderr, "handle req.decode incomplete.\n");
         return 0;
     }else{
-        fprintf(stderr, "handle req.decode %d bytes ok.\n", n);
+        //fprintf(stderr, "handle req.decode %d bytes ok.\n", n);
         _rb.release(n);
-        fprintf(stderr, "_rb.len:%d after _rb release %d left %d bytes.\n", origlen, n, _rb.len());
+        //fprintf(stderr, "_rb.len:%d after _rb release %d left %d bytes.\n", origlen, n, _rb.len());
     }
 
     response_t rsp;
@@ -73,7 +73,7 @@ int endpoint_t::write(){
         bwrite(_fd, &_wb);
     }
     if(!_wb.empty()){
-        fprintf(stderr, "fd:%d regist EPOLLOUT with %d byptes\n", _fd, _wb.len());
+        //fprintf(stderr, "fd:%d regist EPOLLOUT with %d byptes\n", _fd, _wb.len());
         _ep->update(EPOLL_CTL_ADD, _fd, EPOLLOUT, (void*)this);
     }
     return 0;
