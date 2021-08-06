@@ -185,6 +185,6 @@ private:
     int errcode;
 };
 
-typedef std::function<int(request_t *, response_t *)> RpcCallback;
+typedef std::function<int(response_t *)> RpcCallback;
 
 #endif

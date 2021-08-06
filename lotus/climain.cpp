@@ -5,7 +5,7 @@
 #include "engine.h"
 #include "dialer.h"
 
-int rpcdone(request_t *req, response_t *rsp){
+int rpcdone(response_t *rsp){
     fprintf(stderr, "call rpc done, response:[%s]\n", rsp->data());
     return 0;
 }

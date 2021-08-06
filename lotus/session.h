@@ -8,11 +8,11 @@ class session_t{
 public:
     int reply(response_t *rsp){
         if(_callback){
-            return _callback(_req, rsp);
+            return _callback(rsp);
         }
     }
 
-    request_t *_req;
+    //request_t *_req;
     RpcCallback _callback;
 };
 
