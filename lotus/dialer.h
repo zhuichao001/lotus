@@ -27,7 +27,7 @@ public:
 
         buff_t buf(1024);
         req->encode(&buf);
-        fprintf(stderr, "request encode, len:%d\n", buf.len());
+        //fprintf(stderr, "request encode, len:%d\n", buf.len());
         _ioh->send(&buf);
         return 0;
     }
