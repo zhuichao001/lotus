@@ -11,7 +11,9 @@
 
 int startpoint_t::open(){
     _fd = connect(_addr->ip.c_str(), _addr->port);
-    assert(_fd>0);
+    if(_fd<=0){
+        return -1;
+    }
 
     set_unblocking(_fd, 1);
     set_reuseaddr(_fd, 1);
