@@ -58,3 +58,13 @@ int localip(const std::string &name, std::string &ip){
     ip = inet_ntoa(((struct sockaddr_in*)&(ifreq->ifr_addr))->sin_addr);
     return -1;
 }
+
+void str2hex(const char *data, int len, char *dst){
+    //printf("%s, len=%d\n", data, len);
+    for(int i=0; i<len; ++i){
+        dst[i*2] = (data[i]&0X0F) + 'a';
+        dst[i*2+1] = ((data[i]>>4)&0X0F) + 'a';
+        //printf("%c %c \n", dst[i*2], dst[i*2+1]);
+    }
+    dst[len*2] = 0;
+}

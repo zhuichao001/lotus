@@ -49,7 +49,6 @@ int startpoint_t::write(){
         bwrite(_fd, &_wb);
     }
     if(!_wb.empty()){
-        //fprintf(stderr, "fd:%d regist EPOLLOUT with %d byptes\n", _fd, _wb.len());
         _ep->update(EPOLL_CTL_ADD, _fd, EPOLLOUT, (void*)this);
     }
     return 0;
@@ -58,21 +57,17 @@ int startpoint_t::write(){
 int startpoint_t::receive(){
     response_t rsp;
     int n = rsp.decode(&_rb);
-    if(n<0){
-        //fprintf(stderr, "handle rsp.decode fialed.\n");
+    if(n<0){ //failed
         return -1;
-    }else if(n==0){
-        //fprintf(stderr, "handle req.decode incomplete.\n");
+    }else if(n==0){ //incomplete
         return 0;
-    }else{
-        //fprintf(stderr, "handle rsp.decode %d bytes ok.\n", n);
+    }else{ //ok
         _rb.release(n);
     }
 
     uint64_t msgid = rsp.msgid();
     auto iter = _sessions->find(msgid);
     if(iter == _sessions->end()){
-        //fprintf(stderr, "data msgid:%d not invalid", msgid);
         return -1;
     }
 

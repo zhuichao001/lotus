@@ -25,6 +25,7 @@ public:
     void reset(){
         _start = 0;
         _end = 0;
+        memset(_buff, 0, _capacity);
     }
 
     bool empty(){
@@ -60,6 +61,10 @@ public:
 
     int release(int n){
         _start += n;
+        if(_start==_end){
+            reset();
+        }
+        return 0;
     }
 
     void expend(int right){

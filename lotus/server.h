@@ -14,10 +14,7 @@ public:
 class rpc_server_t: public server_t{
 public:
     int process(request_t *req, response_t *rsp){
-        fprintf(stderr, "rpc server process.\n"); 
-        fprintf(stderr, "rpc req=%s.\n", req->data()); 
-        const char * s = "ECHO::";
-        rsp->setbody(s, strlen(s));
+        fprintf(stderr, "rpc server process req=%s\n", req->data()); 
         rsp->setbody(req->data(), req->len());
         return 0;
     }

@@ -7,6 +7,7 @@
 #include "socket.h"
 #include "protocol.h"
 #include "buff.h"
+#include "util.h"
 #include "socket.h"
 #include "endpoint.h"
 
@@ -36,18 +37,12 @@ int endpoint_t::read(){
 int endpoint_t::receive(){
     request_t req;
     int n = req.decode(&_rb);
-
-    int origlen = _rb.len();
-    if(n<0){
-        //fprintf(stderr, "handle req.decode fialed.\n");
+    if(n<0){ //failed
         return -1;
-    }else if(n==0){
-        //fprintf(stderr, "handle req.decode incomplete.\n");
+    }else if(n==0){ //incomplete
         return 0;
-    }else{
-        //fprintf(stderr, "handle req.decode %d bytes ok.\n", n);
+    }else{ //ok
         _rb.release(n);
-        //fprintf(stderr, "_rb.len:%d after _rb release %d left %d bytes.\n", origlen, n, _rb.len());
     }
 
     response_t rsp;
@@ -73,7 +68,6 @@ int endpoint_t::write(){
         bwrite(_fd, &_wb);
     }
     if(!_wb.empty()){
-        //fprintf(stderr, "fd:%d regist EPOLLOUT with %d byptes\n", _fd, _wb.len());
         _ep->update(EPOLL_CTL_ADD, _fd, EPOLLOUT, (void*)this);
     }
     return 0;

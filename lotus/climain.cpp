@@ -29,8 +29,9 @@ int main(int argc, char *argv[]) {
 
     for(int i=0; i<N; ++i){ //100w
         request_t req;
-        const char *s = "test, 123, abc, @_@";
-        req.setbody(s, strlen(s)+1);
+        const char *s = "test, 123!";
+        req.setbody(s, strlen(s));
+
         cli->call(&req, rpcdone);
     }
 

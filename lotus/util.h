@@ -10,4 +10,6 @@ long long microsec() ;
 
 int localip(const std::string &name, std::string &ip);
 
+void str2hex(const char *data, int len, char *dst);
+
 #endif

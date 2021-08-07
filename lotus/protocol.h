@@ -28,7 +28,7 @@ public:
         delete _body;
     }
 
-    int encode(buff_t *to){
+    int encode(buff_t *to)const{
         char *dest = to->data();
         dest[0] = _msgtype;
 
@@ -50,15 +50,15 @@ public:
         return msglen;
     }
 
-    char *data(){
+    const char *data()const{
         return _body->data();
     }
 
-    int len(){
+    int len()const{
         return _body->len();
     }
 
-    uint64_t msgid(){
+    uint64_t msgid()const{
         return _msgid;
     }
 
@@ -68,7 +68,7 @@ public:
 
     int decode(buff_t *from){
         if(from->len()<13){
-            fprintf(stderr, "warning: buff len:%d is too less\n", from->len());
+            //fprintf(stderr, "warning: buff len:%d is too less\n", from->len());
             return 0;
         }
 
@@ -109,7 +109,7 @@ public:
         msg.setmsgid(++base_msgid);
     }
 
-    int encode(buff_t *b){
+    int encode(buff_t *b)const{
         return msg.encode(b);
     }
 
@@ -125,15 +125,15 @@ public:
         msg.setmsgid(id);
     }
 
-    const char * data(){
+    const char * data()const{
         return msg.data();
     }
 
-    int len(){
+    int len()const{
         return msg.len();
     }
 
-    int msgid(){
+    int msgid()const{
         return msg.msgid();
     }
 
@@ -148,7 +148,7 @@ public:
         errcode(0){
     }
 
-    int encode(buff_t *b){
+    int encode(buff_t *b)const{
         return msg.encode(b);
     }
 
@@ -164,15 +164,15 @@ public:
         errcode = err;
     }
 
-    const char * data(){
+    const char * data()const{
         return msg.data();
     }
 
-    int len(){
+    int len()const{
         return msg.len();
     }
 
-    int msgid(){
+    int msgid()const{
         return msg.msgid();
     }
 
