@@ -34,6 +34,10 @@ public:
         return _ioh->fd();
     }
 
+    bool usable(){
+        return fd()>0;
+    }
+
 private:
     const address_t *_addr;
     startpoint_t *_ioh;

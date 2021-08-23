@@ -21,7 +21,7 @@ public:
         _svr(svr){
     }
 
-    virtual ~ acceptor_t() {
+    virtual ~acceptor_t() {
         close();
     }
 

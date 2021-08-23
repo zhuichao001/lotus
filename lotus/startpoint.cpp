@@ -11,7 +11,7 @@
 
 int startpoint_t::open(){
     _fd = connect(_addr->ip.c_str(), _addr->port);
-    if(_fd<=0){
+    if(_fd<0){
         return -1;
     }
 

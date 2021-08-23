@@ -25,15 +25,20 @@ int acceptor_t::close() {
 }
 
 int acceptor_t::read() {
-    int cfd = ::accept(_fd); //TODO
-    if(cfd<0){
-        return -1;
-    }
-    fprintf(stderr, "%d accept client fd:%d.\n", _fd, cfd);
+    while(true){
+        int fd = ::accept(_fd);
+        if(fd==-1){
+            if(errno==EAGAIN || errno==EWOULDBLOCK){
+                return 0;
+            }
+            return -1;
+        }
+        fprintf(stderr, "listenfd:%d accept client fd:%d.\n", _fd, fd);
 
-    address_t *addr = new address_t;
-    get_peer_ip_port(_fd, &(addr->ip), &(addr->port));
-    endpoint_t *h = new endpoint_t(_ep, cfd, addr, _svr);
-    h->open();
+        address_t *addr = new address_t;
+        get_peer_ip_port(_fd, &(addr->ip), &(addr->port));
+        endpoint_t *h = new endpoint_t(_ep, fd, addr, _svr);
+        h->open();
+    }
     return 0;
 }

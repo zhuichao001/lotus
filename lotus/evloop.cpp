@@ -34,7 +34,7 @@ int evloop_t::loop(){
     for(int i=0; i<n; ++i){
         iohandler_t *h = static_cast<iohandler_t *>(events[i].data.ptr);
         if(events[i].events & EPOLLIN){
-            if(h->read() < 0){ //TODO continously do until fail
+            if(h->read() < 0){
                 delete h;
                 continue;
             }

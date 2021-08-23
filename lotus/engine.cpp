@@ -26,9 +26,6 @@ int engine_t::start(const address_t *addr, server_t* svr){
     acceptor_t *ac = new acceptor_t(_ep, addr, svr);
     ac->open();
     _listeners[ac->fd()] = ac;
-    
-    //TODO DELETE
-    //run_every(std::bind(&engine_t::heartbeat, this), 1000*1000);
     return 0;
 }
 
@@ -39,8 +36,13 @@ void engine_t::stop(){
 //boot new client
 dialer_t * engine_t::open(const address_t *addr){
     dialer_t *cli = new dialer_t(_ep, addr);
-    _clients[cli->fd()] = cli;
-    return cli;
+    if(cli->usable()){
+        _clients[cli->fd()] = cli;
+        return cli;
+    } else {
+        delete cli;
+        return nullptr;
+    }
 }
 
 int engine_t::run(){
