@@ -27,7 +27,7 @@ int acceptor_t::close() {
 int acceptor_t::read() {
     while(true){
         int fd = ::accept(_fd);
-        if(fd==-1 || fd==0){
+        if(fd==-1 || fd==0){ //TODO FIX
             if(errno==EAGAIN || errno==EWOULDBLOCK){
                 return 0;
             }
