@@ -14,7 +14,6 @@ enum MESSAGE_TYPE{
     TYPE_HEARTBEAT
 };
 
-static int base_msgid=0;
 
 class message_t{
 public:
@@ -28,27 +27,9 @@ public:
         delete _body;
     }
 
-    int encode(buff_t *to)const{
-        char *dest = to->data();
-        dest[0] = _msgtype;
+    int encode(buff_t *to)const;
 
-        uint64_t tmp_msgid = _msgid;
-        for(int i=0; i<8; ++i){
-            dest[1+i] = tmp_msgid & 0xff;
-            tmp_msgid >>= 8;
-        }
-
-        uint32_t tmp_bodylen = _bodylen;
-        for(int i=0; i<4; ++i){
-            dest[9+i] = tmp_bodylen & 0xff;
-            tmp_bodylen >>= 8;
-        }
-
-        memcpy(dest+13, data(), len());
-        const int msglen = 13+len();
-        to->expend(msglen);
-        return msglen;
-    }
+    int decode(buff_t *from);
 
     const char *data()const{
         return _body->data();
@@ -66,34 +47,16 @@ public:
         _msgid = id;
     }
 
-    int decode(buff_t *from){
-        if(from->len()<13){
-            //fprintf(stderr, "warning: buff len:%d is too less\n", from->len());
-            return 0;
-        }
-
-        char *data = from->data();
-        _msgtype = uint8_t(data[0]);
-
-        _msgid = 0;
-        for(int i=0; i<8; ++i){
-            _msgid = (_msgid<<8) + uint8_t(data[8-i]);
-        }
-
-        _bodylen = 0;
-        for(int i=0; i<4; ++i){
-            _bodylen = (_bodylen<<8) + uint8_t(data[12-i]);
-        }
-
-        _body->reset();
-        _body->append(data+13, _bodylen);
-        return 13+_bodylen;
-    }
-
     int write(const char *data, int len){
         _body->append(data, len);
         _bodylen += len;
     }
+
+    int setbody(const char* body, int len){
+        write(body, len);
+    }
+
+    static int base_msgid;
 
 private:
     uint8_t _msgtype;
@@ -102,87 +65,26 @@ private:
     buff_t *_body;
 };
 
-class request_t{
+class request_t : public message_t{
 public:
     request_t():
-        msg(TYPE_REQUEST, 128){
-        msg.setmsgid(++base_msgid);
+        message_t(TYPE_REQUEST, 128){
+        setmsgid(++message_t::base_msgid);
     }
-
-    int encode(buff_t *b)const{
-        return msg.encode(b);
-    }
-
-    int decode(buff_t *b){
-        return msg.decode(b);
-    }
-
-    int setbody(const char* body, int len){
-        msg.write(body, len);
-    }
-
-    void setmsgid(uint64_t id){
-        msg.setmsgid(id);
-    }
-
-    const char * data()const{
-        return msg.data();
-    }
-
-    int len()const{
-        return msg.len();
-    }
-
-    int msgid()const{
-        return msg.msgid();
-    }
-
-private:
-    message_t msg;
 };
 
-class response_t{
+class response_t : public message_t{
 public:
     response_t():
-        msg(TYPE_RESPONSE, 128),
-        errcode(0){
-    }
-
-    int encode(buff_t *b)const{
-        return msg.encode(b);
-    }
-
-    int decode(buff_t *b){
-        return msg.decode(b);
-    }
-
-    int setbody(const char *data, int len){
-        return msg.write(data, len);
+        message_t(TYPE_RESPONSE, 128),
+        _errcode(0){
     }
 
     void seterrcode(int err){
-        errcode = err;
+        _errcode = err;
     }
-
-    const char * data()const{
-        return msg.data();
-    }
-
-    int len()const{
-        return msg.len();
-    }
-
-    int msgid()const{
-        return msg.msgid();
-    }
-
-    void setmsgid(uint64_t id){
-        msg.setmsgid(id);
-    }
-
 private:
-    message_t msg;
-    int errcode;
+    int _errcode;
 };
 
 typedef std::function<int(response_t *)> RpcCallback;
