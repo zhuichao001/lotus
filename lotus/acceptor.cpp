@@ -15,7 +15,7 @@ int acceptor_t::open(){
 
     bind_address(_fd, _addr->ip.c_str(), _addr->port);
     ::listen(_fd, BACK_LOG_SIZE);
-    _ep->update(EPOLL_CTL_ADD, _fd, EPOLLIN | EPOLLET, this);
+    _ep->update(EPOLL_CTL_ADD, _fd, EPOLLIN | EPOLLET, (void*)this);
     return 0;
 }
 
@@ -27,10 +27,9 @@ int acceptor_t::close() {
 int acceptor_t::read() {
     while(true){
         int fd = ::accept(_fd);
-        if(fd==-1 || fd==0){ //TODO FIX
-            if(errno==EAGAIN || errno==EWOULDBLOCK){
-                return 0;
-            }
+        if(errno==EAGAIN){
+            return 0;
+        } else if(fd==-1){
             return -1;
         }
         fprintf(stderr, "listenfd:%d accept client fd:%d.\n", _fd, fd);
