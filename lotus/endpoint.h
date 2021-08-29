@@ -34,6 +34,10 @@ public:
     int write() override;
 
     int send(buff_t *buf);
+
+    int fd(){return _fd;}
+
+    bool established(){return _fd>0;}
 private:
     int receive();
 
