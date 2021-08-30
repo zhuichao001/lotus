@@ -2,7 +2,6 @@
 #define _NET_DIALER_H_
 
 #include <ctime>
-#include "transport.h"
 #include "startpoint.h"
 #include "address.h"
 #include "session.h"
@@ -10,7 +9,7 @@
 
 using namespace std;
 
-class dialer_t : public transport_t {
+class dialer_t {
 public:
     dialer_t(evloop_t *ep, const address_t *addr):
         _addr(addr){
