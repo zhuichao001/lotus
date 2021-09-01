@@ -73,7 +73,7 @@ int startpoint_t::receive(){
         return -1;
     }
 
-    iter->second->reply(&rsp);
+    iter->second->onreply(&rsp);
 
     delete iter->second;
     _sessions->erase(msgid);

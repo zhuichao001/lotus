@@ -16,22 +16,17 @@ timetracker_t::timetracker_t(evloop_t *ep):
     _ep->update(EPOLL_CTL_ADD, _timerfd, EPOLLIN | EPOLLET, (void*)this);
 }
 
-lotus::timer_t *timetracker_t::add(lotus::timer_t* t) { 
+int timetracker_t::add(lotus::timer_t* t) { 
     auto it = _timers.find(t);
     if(it!=_timers.end()){
-        return *it;
+        return 0;
     }
 
     _timers.insert(t);
     if(_timers.size()==1 || t->expireat() < (*_timers.begin())->expireat()){
         appoint(t->expireat());
     }
-    return t;
-}
-
-lotus::timer_t *timetracker_t::add(timer_callback_t cb, uint64_t when, uint64_t interval) { 
-    lotus::timer_t* t = new lotus::timer_t(this, cb, when, interval);
-    return add(t);
+    return 0;
 }
 
 int timetracker_t::del(lotus::timer_t *t){
@@ -49,7 +44,6 @@ int timetracker_t::read(){
     ssize_t n = ::read(_timerfd, &howmany, sizeof howmany);
     uint64_t now = microsec();
 
-    std::vector<lotus::timer_t *> expired;
     std::vector<lotus::timer_t *> futures;
     
     for(auto it=_timers.begin(); it!=_timers.end(); ){
@@ -60,6 +54,8 @@ int timetracker_t::read(){
         (*it)->fired();
         if((*it)->repeatable()){
             futures.push_back((*it)->next());
+        } else {
+            delete (*it);    
         }
         it = _timers.erase(it);
     }

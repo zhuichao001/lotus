@@ -52,13 +52,21 @@ int engine_t::run(){
 }
 
 lotus::timer_t *engine_t::run_at(timer_callback_t cb, uint64_t when) {
-    return _tracker->add(cb, when, 0);
+    lotus::timer_t* t = new lotus::timer_t(_tracker, cb, when, 0);
+    _ep->post(std::bind(&timetracker_t::add, _tracker, t));
+    return t;
 }
 
 lotus::timer_t *engine_t::run_after(timer_callback_t cb, uint64_t delay) {
-    return _tracker->add(cb, microsec()+delay, 0);
+    uint64_t when = microsec()+delay;
+    lotus::timer_t* t = new lotus::timer_t(_tracker, cb, when, 0);
+    _ep->post(std::bind(&timetracker_t::add, _tracker, t));
+    return t;
 }
 
 lotus::timer_t *engine_t::run_every(timer_callback_t cb, uint64_t interval) {
-    return _tracker->add(cb, microsec()+interval, interval);
+    uint64_t when = microsec()+interval;
+    lotus::timer_t* t = new lotus::timer_t(_tracker, cb, when, interval);
+    _ep->post(std::bind(&timetracker_t::add, _tracker, t));
+    return t;
 }

@@ -12,7 +12,7 @@ public:
         _state = UNKNOWN;
     }
 
-    int reply(response_t *rsp){
+    int onreply(response_t *rsp){
         if(_callback){
             return _callback(rsp);
         }

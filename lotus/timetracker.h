@@ -13,9 +13,7 @@ class timetracker_t : public iohandler_t {
 public:
     timetracker_t(evloop_t *ep);
 
-    lotus::timer_t *add(timer_callback_t cb, uint64_t when, uint64_t interval);
-
-    lotus::timer_t *add(lotus::timer_t* t); 
+    int add(lotus::timer_t* t); 
 
     int del(lotus::timer_t *t);
 

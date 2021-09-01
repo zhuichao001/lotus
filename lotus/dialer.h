@@ -25,21 +25,25 @@ public:
             return;
         }
 
+        fprintf(stderr, "%ld timeout @ %ld\n", msgid, microsec());
+
         session_t *session = it->second;
         if(!session->completed()){
             response_t rsp;
             rsp.seterrcode(RPC_TIMEOUT);
-            session->reply(&rsp);
+            session->onreply(&rsp);
             fprintf(stderr, "msgid:%ld TIME-OUT.\n", msgid);
             session->_state = session_t::REPLY_TIMEOUT;
         }
     }
 
-    int call(const request_t *req,  RpcCallback callback, uint64_t us=2000000 /*timeout milisec*/){
+    int call(const request_t *req,  RpcCallback callback, uint64_t us=2000000 /*timeout microsec*/){
         uint64_t msgid = req->msgid();
 
         _sessions[msgid] = new session_t; 
         _sessions[msgid]->_callback = [=](response_t *rsp)->int{ //decorator
+
+            fprintf(stderr, "%ld onreply @ %ld\n", msgid, microsec());
             auto it = _sessions.find(msgid);
             if(it==_sessions.end()){
                 fprintf(stderr, "msgid:%ld has been erased.\n", msgid);
@@ -55,8 +59,10 @@ public:
         };
 
         _sessions[msgid]->_state = session_t::WAIT_REPLY;
-        _sessions[msgid]->_rpcat = millisec();
+        _sessions[msgid]->_rpcat = microsec();
         _watcher->run_after(std::bind(&dialer_t::ontimeout, this, msgid), us);
+
+        fprintf(stderr, "%ld call @ %ld\n", msgid, microsec());
 
         buff_t buf(2048);
         req->encode(&buf);
