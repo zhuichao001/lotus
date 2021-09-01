@@ -5,6 +5,7 @@
 #include <sys/epoll.h>
 #include <errno.h>
 #include "types.h"
+#include "list.h"
 #include "timedriver.h"
 
 class timetracker_t;
@@ -20,7 +21,7 @@ public:
     void post(task_t t);
 private:
     int _efd;
-    std::list<task_t> _pendings;
+    List<task_t> _pendings;
 };
 
 #endif

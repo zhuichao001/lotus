@@ -53,11 +53,13 @@ int evloop_t::loop(){
         }
     }
 
-    while(!_pendings.empty()){
-        task_t routine = _pendings.front();
-        _pendings.pop_front();
+    while(true){
+        task_t routine;
+        if(!_pendings.pop_front(&routine)){
+            break;
+        }
         int e = routine();
-        if(e>0){
+        if(e>0){ //retry
             _pendings.push_back(routine);
         }
     }
