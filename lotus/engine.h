@@ -19,7 +19,7 @@
 #include "address.h"
 #include "evloop.h"
 #include "acceptor.h"
-#include "server.h"
+#include "service.h"
 #include "dialer.h"
 #include "timer.h"
 #include "timetracker.h"
@@ -38,7 +38,7 @@ public:
     dialer_t * open(const address_t *addr);
 
     //boot new server
-    int start(const address_t *addr, server_t* svr);
+    int start(const address_t *addr, service_t* svr);
 
     void stop();
 

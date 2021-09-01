@@ -73,6 +73,11 @@ public:
     }
 };
 
+enum ErrorCode{
+    OK = 0,
+    RPC_TIMEOUT = -101
+};
+
 class response_t : public message_t{
 public:
     response_t():
@@ -80,11 +85,16 @@ public:
         _errcode(0){
     }
 
-    void seterrcode(int err){
+    void seterrcode(int32_t err){
         _errcode = err;
     }
+
+    int32_t errcode(){
+        return _errcode;
+    }
+
 private:
-    int _errcode;
+    int32_t _errcode;
 };
 
 typedef std::function<int(response_t *)> RpcCallback;

@@ -10,11 +10,11 @@
 #include "address.h"
 #include "buff.h"
 #include "evloop.h"
-#include "server.h"
+#include "service.h"
 
 class acceptor_t: public iohandler_t {
 public:
-    acceptor_t(evloop_t *ep, const address_t *addr, server_t *svr):
+    acceptor_t(evloop_t *ep, const address_t *addr, service_t *svr):
         _ep(ep),
         _fd(-1),
         _addr(addr), 
@@ -40,7 +40,7 @@ private:
     evloop_t *_ep;
     int _fd;
     const address_t *_addr;
-    server_t *_svr;
+    service_t *_svr;
 };
 
 #endif
