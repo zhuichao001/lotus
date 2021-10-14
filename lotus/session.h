@@ -8,14 +8,16 @@
 class session_t{
 public:
     session_t(){
+        _callback = nullptr;
         _rpcat = millisec();
         _state = UNKNOWN;
     }
 
     int onreply(response_t *rsp){
-        if(_callback){
-            return _callback(rsp);
+        if(_callback==nullptr){
+            return 0;
         }
+        return _callback(rsp);
     }
 
     bool completed(){

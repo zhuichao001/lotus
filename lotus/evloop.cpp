@@ -63,4 +63,5 @@ int evloop_t::loop(){
             _pendings.push_back(routine);
         }
     }
+    return 0;
 }

@@ -49,6 +49,7 @@ int engine_t::run(){
     while (_running) {
         _ep->loop();
     }
+    return 0;
 }
 
 lotus::timer_t *engine_t::run_at(timer_callback_t cb, uint64_t when) {

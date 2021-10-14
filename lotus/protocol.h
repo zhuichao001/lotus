@@ -50,9 +50,10 @@ public:
     int write(const char *data, int len){
         _body->append(data, len);
         _bodylen += len;
+        return len;
     }
 
-    int setbody(const char* body, int len){
+    void setbody(const char* body, int len){
         write(body, len);
     }
 

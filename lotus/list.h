@@ -11,7 +11,6 @@ public:
     T val;
 };
 
-
 template<class T>
 class List {
     node<T> *head, _;
@@ -42,7 +41,7 @@ public:
         e->val = t;
 
         node<T> *last = nullptr;
-        while(true){
+        while (true) {
             last = this->tail;
             //if tailor is moved, try again
             if(last!=this->tail){
@@ -65,15 +64,15 @@ public:
 
     bool pop_front(T *t) {
         node<T> *first=nullptr;
-        do{
+        do {
             first = head->next;
             if (first == nullptr){
                 return false;
             }
-        } while( !__sync_bool_compare_and_swap((uint64_t**)(&head->next), (uint64_t*)first, (uint64_t*)(first->next)) );
+        } while (!__sync_bool_compare_and_swap((uint64_t**)(&head->next), (uint64_t*)first, (uint64_t*)(first->next)));
 
         first->next = nullptr;
-        if(first==tail){
+        if (first==tail) {
             tail = head;
         }
 

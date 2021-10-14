@@ -1,6 +1,7 @@
 #ifndef _NET_TIMER_H_
 #define _NET_TIMER_H_
 
+#include <stdint.h>
 #include "types.h"
 
 class timetracker_t;

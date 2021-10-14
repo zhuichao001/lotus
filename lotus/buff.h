@@ -97,6 +97,7 @@ public:
 
     int append(buff_t *b){
         append(b->data(), b->len());
+        return 0;
     }
 
 private:
