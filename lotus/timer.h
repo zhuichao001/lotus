@@ -36,7 +36,7 @@ private:
 //Timer poninter compare
 class TimerCompare {
 public:
-    bool operator()(const timer_t *left, const timer_t *right) {
+    bool operator()(const timer_t *left, const timer_t *right) const {
         return left->expireat() < right->expireat();
     }
 };
