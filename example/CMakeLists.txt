@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.10)
 
 project(lotus C CXX)
 
-add_definitions(-std=gnu++11)
+add_definitions(-std=c++14)
 
 set(CXX_FLAGS
  -g
@@ -11,13 +11,6 @@ set(CXX_FLAGS
  -Wall
  -Wextra
  -Werror
- -Wconversion
- -Wno-unused-parameter
- -Wold-style-cast
- -Woverloaded-virtual
- -Wpointer-arith
- -Wshadow
- -Wwrite-strings
  -march=native
  -std=c++14
  -rdynamic
