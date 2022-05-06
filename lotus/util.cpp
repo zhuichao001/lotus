@@ -68,3 +68,45 @@ void str2hex(const char *data, int len, char *dst){
     }
     dst[len*2] = 0;
 }
+
+char *str2upper(char *data){
+    for(int i=0; data[i]!=0 ;++i){
+        if(data[i]>='a' && data[i]<='z'){
+            data[i] = data[i]-'a'+'A';
+        }
+    }
+    return data;
+}
+
+//the length of `to` must be no less than `raw`
+int copy_until(const char* &raw, const char *end, char *to, int tolen){
+    int i=0; //as index of raw
+    int j=0; //as index of end
+    int k=0; //as index of to
+    while(true){
+        if(raw[i]!=end[j]){
+            for(int m=0; m<j; ++m){
+                if(k==tolen-1){
+                    return -1;
+                }
+                to[k++] = end[m];
+            }
+            if(k==tolen-1){
+                return -1;
+            }
+            to[k++] = raw[i++];
+            j=0;
+        }else{
+            ++i;
+            ++j;
+            if(end[j]==0){
+                break;
+            }
+            if(raw[i]==0){
+                return -1;
+            }
+        }
+    }
+    raw = raw+i;
+    return 0;
+}
