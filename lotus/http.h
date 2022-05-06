@@ -15,14 +15,21 @@ char *strupper(char *data){
     return data;
 }
 
-int copy_until(const char* &raw, const char *end, char *to){
+//the length of `to` must be no less than `raw`
+int copy_until(const char* &raw, const char *end, char *to, int tolen){
     int i=0; //as index of raw
     int j=0; //as index of end
     int k=0; //as index of to
     while(true){
         if(raw[i]!=end[j]){
             for(int m=0; m<j; ++m){
+                if(k==tolen-1){
+                    return -1;
+                }
                 to[k++] = end[m];
+            }
+            if(k==tolen-1){
+                return -1;
             }
             to[k++] = raw[i++];
             j=0;
@@ -43,7 +50,7 @@ int copy_until(const char* &raw, const char *end, char *to){
 
 const char * http_version = "HTTP/1.1";
 
-typedef char*  mime_t;
+typedef std::string mime_t;
 const mime_t TEXT_HTML  = "text/html";
 const mime_t TEXT_PLAIN = "text/plain";
 const mime_t TEXT_XML   = "text/xml";
@@ -51,7 +58,7 @@ const mime_t IMG_PNG    = "image/png";
 const mime_t APP_JSON   = "application/json";
 const mime_t APP_FORM   = "x-www-form-urlencoded";
 
-typedef char* method_t;
+typedef std::string method_t;
 const method_t GET      = "GET";
 const method_t POST     = "POST";
 const method_t PUT      = "PUT";
@@ -101,25 +108,25 @@ public:
     }
 
     int decode(const char *buf, int len){
-        char tmp[256];
+        char tmp[512];
         const char *raw = buf;
-        if(copy_until(raw, " ", tmp)<0){
+        if(copy_until(raw, " ", tmp, sizeof(tmp))<0){
             return -1;
         }
-        _method = static_cast<method_t>(strupper(tmp));
+        _method = strupper(tmp);
 
-        if(copy_until(raw, " ", tmp)<0){
+        if(copy_until(raw, " ", tmp, sizeof(tmp))<0){
             return -1;
         }
         _uri = tmp;
 
-        if(copy_until(raw, "\r\n", tmp)<0){
+        if(copy_until(raw, "\r\n", tmp, sizeof(tmp))<0){
             return -1;
         }
         //ignore
 
         while(true){
-            if(copy_until(raw, ":", tmp)<0){
+            if(copy_until(raw, ":", tmp, sizeof(tmp))<0){
                 return -1;
             }
             if(strlen(tmp)==0){
@@ -129,8 +136,8 @@ public:
             char key[64];
             char val[256];
             const char *tmp_raw = tmp;
-            copy_until(tmp_raw, ":", key);
-            copy_until(tmp_raw, "\r\n", val);
+            copy_until(tmp_raw, ":", key, sizeof(tmp));
+            copy_until(tmp_raw, "\r\n", val, sizeof(tmp));
 
             if(strcasecmp(key, "Host")==0){
                 _host = val;
@@ -144,7 +151,7 @@ public:
                 _accept = strupper(val);
             }
         }
-        copy_until(raw, "\0", tmp);
+        copy_until(raw, "\0", tmp, sizeof(tmp));
         _body = tmp;
         return 0;
     }
@@ -211,23 +218,23 @@ public:
     int decode(const char *buf, int len){
         char tmp[256];
         const char *raw = buf;
-        if(copy_until(raw, " ", tmp)<0){
+        if(copy_until(raw, " ", tmp, sizeof(tmp))<0){
             return -1;
         }
         //ignore http version
 
-        if(copy_until(raw, " ", tmp)<0){
+        if(copy_until(raw, " ", tmp, sizeof(tmp))<0){
             return -1;
         }
         _status = static_cast<status_t>(atoi(tmp));
 
-        if(copy_until(raw, "\r\n", tmp)<0){
+        if(copy_until(raw, "\r\n", tmp, sizeof(tmp))<0){
             return -1;
         }
         //ignore status message
 
         while(true){
-            if(copy_until(raw, "\r\n", tmp)<0){
+            if(copy_until(raw, "\r\n", tmp, sizeof(tmp))<0){
                 return -1;
             }
             if(strlen(tmp)==0){
@@ -237,8 +244,8 @@ public:
             char key[64];
             char val[256];
             const char *tmp_raw = tmp;
-            copy_until(tmp_raw, ":", key);
-            copy_until(tmp_raw, "\r\n", val);
+            copy_until(tmp_raw, ":", key, sizeof(tmp));
+            copy_until(tmp_raw, "\r\n", val, sizeof(tmp));
 
             if(strcasecmp(key, "Content-Type")==0){
                 _content_type = val;
@@ -246,7 +253,7 @@ public:
                 _content_len = atoi(val);
             }
         }
-        copy_until(raw, "\0", tmp);
+        copy_until(raw, "\0", tmp, sizeof(tmp));
         _body = tmp;
 
         if(_body.size()==_content_len){
