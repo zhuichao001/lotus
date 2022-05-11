@@ -5,14 +5,12 @@
 #include <assert.h>
 
 template<class T>
-class Node {
-public:
-    Node * next;
-    T val;
-};
-
-template<class T>
 class List {
+    struct Node {
+        Node * next;
+        T val;
+    };
+
     Node<T> *head, _;
     Node<T> *tail;
 public:
