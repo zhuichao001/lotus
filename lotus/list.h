@@ -11,8 +11,8 @@ class List {
         T val;
     };
 
-    Node<T> *head, _;
-    Node<T> *tail;
+    Node *head, _;
+    Node *tail;
 public:
 
     List() {
@@ -21,9 +21,9 @@ public:
     }
 
     ~List(){
-        Node<T> *cur = head->next;
+        Node *cur = head->next;
         while(cur){
-            Node<T> *next = cur->next;
+            Node *next = cur->next;
             delete cur;
             cur = next;
         }
@@ -34,11 +34,11 @@ public:
     }
 
     void push_back(T t) {
-        Node<T> * e = new Node<T>();
+        Node * e = new Node();
         e->next = nullptr;
         e->val = t;
 
-        Node<T> *last = nullptr;
+        Node *last = nullptr;
         while (true) {
             last = this->tail;
             //if tailor is moved, try again
@@ -46,7 +46,7 @@ public:
                 continue;
             }
 
-            Node<T> *back = last->next;
+            Node *back = last->next;
             //if tailor's next is not null, set tailor to back
             if(back!=nullptr){
                 __sync_bool_compare_and_swap((uint64_t**)(&tail), (uint64_t*)last, (uint64_t*)back);
@@ -61,7 +61,7 @@ public:
     }
 
     bool pop_front(T *t) {
-        Node<T> *first=nullptr;
+        Node *first=nullptr;
         do {
             first = head->next;
             if (first == nullptr){
