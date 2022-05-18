@@ -1,6 +1,7 @@
 #ifndef _NET_ENDPOINT_H_
 #define _NET_ENDPOINT_H_
 
+#include <memory>
 #include "iohandler.h"
 #include "evloop.h"
 #include "service.h"
@@ -9,14 +10,21 @@
 #include "socket.h"
 #include "endpoint.h"
 
+enum SIDE_TYPE{
+    CLIENT_SIDE = 1,
+    SERVER_SIDE = 2,
+};
 
-class endpoint_t: public iohandler_t {
+typedef std::function<int(void *)> ReceiveCallback;
+
+class endpoint_t: public iohandler_t, 
+    public std::enable_shared_from_this<endpoint_t> {
 public:
-    endpoint_t(evloop_t *ep, int fd, const address_t *addr, service_t *svr):
+    endpoint_t(SIDE_TYPE side, evloop_t *ep, int fd, ReceiveCallback cb):
+        _side(side),
         _ep(ep), 
         _fd(fd),
-        _addr(addr), 
-        _svr(svr),
+        _callback(cb),
         _rb(2048), 
         _wb(4096){
     }
@@ -41,10 +49,11 @@ public:
 private:
     int receive();
 
+    SIDE_TYPE _side;
     evloop_t *_ep;
     int _fd;
-    const address_t *_addr;
-    service_t *_svr;
+    ReceiveCallback _callback;
+
     buff_t _rb;
     buff_t _wb;
 };

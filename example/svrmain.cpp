@@ -1,13 +1,15 @@
 ﻿#include <stdio.h>
 #include "engine.h"
 #include "service.h"
+#include "session.h"
 
 class rpc_service_t: public service_t{
 public:
-    int process(request_t *req, response_t *rsp){
-        fprintf(stderr, "rpc server process req=%s\n", req->data()); 
+    int process(session_t *se){
+        fprintf(stderr, "rpc server process req=%s\n", ses->request()->data()); 
         sleep(3); // simulate caculate duration
-        rsp->setbody(req->data(), req->len());
+        response_t rsp(req->data(), req->len());
+        ses->reply(&rsp); 
         return 0;
     }
 };

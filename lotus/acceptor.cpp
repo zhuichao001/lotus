@@ -4,6 +4,7 @@
 #include "socket.h"
 #include "address.h"
 #include "evloop.h"
+#include "backer.h"
 
 int acceptor_t::open(){
     _fd = socket(AF_INET, SOCK_STREAM,0);
@@ -36,7 +37,7 @@ int acceptor_t::read() {
 
         address_t *addr = new address_t;
         get_peer_ip_port(_fd, &(addr->ip), &(addr->port));
-        endpoint_t *h = new endpoint_t(_ep, fd, addr, _svr);
+        backer_t *h = new backer_t(_ep, fd, addr, _svr);
         h->open();
     }
     return 0;

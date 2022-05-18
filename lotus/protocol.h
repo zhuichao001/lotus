@@ -7,13 +7,13 @@
 #include <stdio.h>
 #include "buff.h"
 #include "util.h"
+#include "endpoint.h"
 
 enum MESSAGE_TYPE{
     TYPE_REQUEST=0,
     TYPE_RESPONSE,
     TYPE_HEARTBEAT
 };
-
 
 class message_t{
 public:
@@ -84,6 +84,12 @@ public:
     response_t():
         message_t(TYPE_RESPONSE, 128),
         _errcode(0){
+    }
+
+    response_t(const char* body, int len, int err=OK):
+        message_t(TYPE_RESPONSE, 128){
+        _errcode = err;
+        setbody(body, len);
     }
 
     void seterrcode(int32_t err){

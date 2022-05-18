@@ -2,7 +2,7 @@
 #define _NET_DIALER_H_
 
 #include <ctime>
-#include "startpoint.h"
+#include "endpoint.h"
 #include "address.h"
 #include "session.h"
 #include "util.h"
@@ -12,10 +12,18 @@ using namespace std;
 class dialer_t {
 public:
     dialer_t(evloop_t *ep, const address_t *addr, timedriver_t *td):
+        _ep(ep),
         _addr(addr),
         _watcher(td){
-        _ioh = new startpoint_t(ep, addr, &_sessions);
-        _ioh->open();
+    }
+
+    int open(){
+        int fd = connect(_addr->ip.c_str(), _addr->port);
+        if(fd<0){
+            return -1;
+        }
+        _conn = new endpoint_t(CLIENT_SIDE, _ep, fd, std::bind(&dialer_t::receive, this, std::placeholders::_1));
+        _conn->open();
     }
 
     void ontimeout(uint64_t msgid){
@@ -37,10 +45,10 @@ public:
         }
     }
 
-    int call(const request_t *req,  RpcCallback callback, uint64_t us=2000000 /*timeout microsec*/){
+    int call(request_t *req,  RpcCallback callback, uint64_t us=2000000 /*timeout microsec*/){
         uint64_t msgid = req->msgid();
 
-        _sessions[msgid] = new session_t; 
+        _sessions[msgid] = new session_t(_conn->shared_from_this(), req); 
         _sessions[msgid]->_callback = [=](response_t *rsp)->int{ //decorator
 
             fprintf(stderr, "%ld onreply @ %ld\n", msgid, microsec());
@@ -66,12 +74,27 @@ public:
 
         buff_t buf(2048);
         req->encode(&buf);
-        _ioh->send(&buf);
+        _conn->send(&buf);
         return 0;
     }
 
+    int receive(void *response){
+        response_t *rsp = static_cast<response_t*>(response);
+        uint64_t msgid = rsp->msgid();
+        auto iter = _sessions.find(msgid);
+        if(iter == _sessions.end()){
+            return -1;
+        }
+    
+        iter->second->onreply(rsp);
+    
+        delete iter->second;
+        _sessions.erase(msgid);
+        return 1;
+    }
+
     int fd() {
-        return _ioh->fd();
+        return _conn->fd();
     }
 
     bool usable(){
@@ -79,9 +102,10 @@ public:
     }
 
 private:
+    evloop_t *_ep;
     const address_t *_addr;
     timedriver_t *_watcher;
-    startpoint_t *_ioh;
+    endpoint_t *_conn;
     SessionMap _sessions;
 };
 

@@ -3,11 +3,12 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "protocol.h"
+
+class session_t;
 
 class service_t {
 public:
-    virtual int process(request_t *req, response_t *rsp) = 0;
+    virtual int process(session_t *se) = 0;
     virtual ~service_t() = default;
 };
 
