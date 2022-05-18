@@ -21,6 +21,8 @@ int endpoint_t::open(){
 }
 
 int endpoint_t::close(){
+    _cbs.on_close();
+
     _wb.reset();
     _rb.reset();
 
@@ -43,25 +45,27 @@ int endpoint_t::receive(){
         request_t *req = new request_t();
         int n = req->decode(&_rb);
         if(n<0){ //failed
+            fprintf(stderr, "Error: request decode failed\n");
             return -1;
         }else if(n==0){ //incomplete
             return 0;
         }else{ //ok
             _rb.release(n);
         }
-        _callback(req);
+        _cbs.on_receive(req);
         return 1; //1 indicate: continuously receive in evloop
     }else{ //CLIENT SIDE
         response_t rsp;
         int n = rsp.decode(&_rb);
         if(n<0){ //failed
+            fprintf(stderr, "Error: response decode failed\n");
             return -1;
         }else if(n==0){ //incomplete
             return 0;
         }else{ //ok
             _rb.release(n);
         }
-        _callback(&rsp);
+        _cbs.on_receive(&rsp);
         return 1;
     }
 }

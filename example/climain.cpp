@@ -20,7 +20,7 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
-    int N = atoi(argv[1]);
+    int N = atoi(argv[2]);
 
     engine_t eng;
     std::thread th([=, &eng]{
@@ -31,12 +31,14 @@ int main(int argc, char *argv[]) {
     dialer_t *cli = eng.open(&addr);
     fprintf(stderr, "client [%s] boot up.\n", "127.0.0.1:8001");
 
-    for(int i=0; i<N; ++i){ //100w
-        request_t req;
+    fprintf(stderr, "N:%d\n", N);
+    for(int i=0; i<N; ++i){
+        request_t *req = new request_t;
         const char *s = "test, 123!";
-        req.setbody(s, strlen(s));
+        req->setbody(s, strlen(s));
 
-        cli->call(&req, rpcdone);
+        fprintf(stderr, "cli call\n");
+        cli->call(req, rpcdone);
     }
 
     th.join();

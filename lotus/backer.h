@@ -13,24 +13,40 @@ using namespace std;
 class backer_t {
 public:
     backer_t(evloop_t *ep, int fd, const address_t *addr, service_t *svr):
+        _ep(ep),
+        _fd(fd),
         _addr(addr),
         _svr(svr){
-        _conn = new endpoint_t(SERVER_SIDE, ep, fd, std::bind(&backer_t::receive, this, std::placeholders::_1));
     }
 
     int open(){
-        return _conn->open();
+        endpoint_callbacks_t cbs{
+            std::bind(&backer_t::receive, this, std::placeholders::_1),
+            std::bind(&backer_t::close, this),
+        };
+        _conn = new endpoint_t(SERVER_SIDE, _ep, _fd, cbs);
+        int err = _conn->open();
+        fprintf(stderr, "fd:%d open iohandler\n", _conn->fd());
+        return err;
+    }
+
+    int close(){
+        delete this; //FIXME
+        return 0;
     }
 
     int receive(void *request){
         request_t *req = static_cast<request_t*>(request);
         uint64_t msgid = req->msgid();
-        _sessions[msgid] = new session_t(_conn->shared_from_this(), req); 
+        fprintf(stderr, "receive msg:%d to process\n", msgid);
+        _sessions[msgid] = new session_t(_conn, req); 
         _svr->process(_sessions[msgid]);
         return 0;
     }
 
 private:
+    evloop_t *_ep;
+    int _fd;
     const address_t *_addr;
     timedriver_t *_watcher;
     endpoint_t *_conn;

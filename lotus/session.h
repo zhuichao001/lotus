@@ -14,12 +14,12 @@ public:
         REPLY_FINISH = 3,
     } _state;
 
-    std::shared_ptr<endpoint_t> _conn;
+    endpoint_t *_conn;
     request_t *_req;
     RpcCallback _callback;
     uint64_t  _rpcat; //start time
 
-    session_t(std::shared_ptr<endpoint_t> conn, request_t *req):
+    session_t(endpoint_t *conn, request_t *req):
         _conn(conn),
         _req(req){
         _callback = nullptr;

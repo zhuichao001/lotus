@@ -22,8 +22,18 @@ public:
         if(fd<0){
             return -1;
         }
-        _conn = new endpoint_t(CLIENT_SIDE, _ep, fd, std::bind(&dialer_t::receive, this, std::placeholders::_1));
+
+        endpoint_callbacks_t cbs{
+            std::bind(&dialer_t::receive, this, std::placeholders::_1),
+            std::bind(&dialer_t::close, this),
+        };
+        _conn = new endpoint_t(CLIENT_SIDE, _ep, fd, cbs);
         _conn->open();
+        return 0;
+    }
+
+    int close(){
+        delete this; //FIXME
         return 0;
     }
 
@@ -49,7 +59,7 @@ public:
     int call(request_t *req,  RpcCallback callback, uint64_t us=2000000 /*timeout microsec*/){
         uint64_t msgid = req->msgid();
 
-        _sessions[msgid] = new session_t(_conn->shared_from_this(), req); 
+        _sessions[msgid] = new session_t(_conn, req); 
         _sessions[msgid]->_callback = [=](response_t *rsp)->int{ //decorator
 
             fprintf(stderr, "%ld onreply @ %ld\n", msgid, microsec());
@@ -67,6 +77,7 @@ public:
             return callback(rsp);
         };
 
+        fprintf(stderr, "before %ld call @ %ld\n", msgid, microsec());
         _sessions[msgid]->_state = session_t::WAIT_REPLY;
         _sessions[msgid]->_rpcat = microsec();
         _watcher->run_after(std::bind(&dialer_t::ontimeout, this, msgid), us);
