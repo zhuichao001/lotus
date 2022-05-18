@@ -36,6 +36,7 @@ void engine_t::stop(){
 //boot new client
 dialer_t * engine_t::open(const address_t *addr){
     dialer_t *cli = new dialer_t(_ep, addr, this);
+    cli->open();
     if(cli->usable()){
         _clients[cli->fd()] = cli;
         return cli;

@@ -24,6 +24,7 @@ public:
         }
         _conn = new endpoint_t(CLIENT_SIDE, _ep, fd, std::bind(&dialer_t::receive, this, std::placeholders::_1));
         _conn->open();
+        return 0;
     }
 
     void ontimeout(uint64_t msgid){
