@@ -2,24 +2,17 @@
 #define _NET_ENDPOINT_H_
 
 #include <memory>
-#include "iohandler.h"
+#include "handler.h"
 #include "evloop.h"
 #include "service.h"
 #include "address.h"
 #include "buff.h"
 #include "socket.h"
-#include "endpoint.h"
+#include "handler.h"
 
 enum SIDE_TYPE{
     CLIENT_SIDE = 1,
     SERVER_SIDE = 2,
-};
-
-
-class comhandler_t {
-public:
-    virtual int onreceive(void *) = 0;
-    virtual int onclose() = 0;
 };
 
 class endpoint_t: 
