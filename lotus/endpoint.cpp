@@ -21,7 +21,7 @@ int endpoint_t::open(){
 }
 
 int endpoint_t::close(){
-    _cbs.on_close();
+    _com->onclose();
 
     _wb.reset();
     _rb.reset();
@@ -52,7 +52,7 @@ int endpoint_t::receive(){
         }else{ //ok
             _rb.release(n);
         }
-        _cbs.on_receive(req);
+        _com->onreceive(req);
         return 1; //1 indicate: continuously receive in evloop
     }else{ //CLIENT SIDE
         response_t rsp;
@@ -65,7 +65,7 @@ int endpoint_t::receive(){
         }else{ //ok
             _rb.release(n);
         }
-        _cbs.on_receive(&rsp);
+        _com->onreceive(&rsp);
         return 1;
     }
 }

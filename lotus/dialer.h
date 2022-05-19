@@ -9,7 +9,8 @@
 
 using namespace std;
 
-class dialer_t {
+class dialer_t:
+    public comhandler_t {
 public:
     dialer_t(evloop_t *ep, const address_t *addr, timedriver_t *td):
         _ep(ep),
@@ -23,16 +24,12 @@ public:
             return -1;
         }
 
-        endpoint_callbacks_t cbs{
-            std::bind(&dialer_t::receive, this, std::placeholders::_1),
-            std::bind(&dialer_t::close, this),
-        };
-        _conn = new endpoint_t(CLIENT_SIDE, _ep, fd, cbs);
+        _conn = new endpoint_t(CLIENT_SIDE, _ep, fd, this);
         _conn->open();
         return 0;
     }
 
-    int close(){
+    int onclose(){
         delete this; //FIXME
         return 0;
     }
@@ -90,7 +87,7 @@ public:
         return 0;
     }
 
-    int receive(void *response){
+    int onreceive(void *response){
         response_t *rsp = static_cast<response_t*>(response);
         uint64_t msgid = rsp->msgid();
         auto iter = _sessions.find(msgid);

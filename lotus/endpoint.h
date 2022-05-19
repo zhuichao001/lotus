@@ -16,22 +16,20 @@ enum SIDE_TYPE{
 };
 
 
-typedef std::function<int(void *)> message_callback_t;
-typedef std::function<int(void)> close_callback_t;
-
-struct endpoint_callbacks_t {
-    message_callback_t on_receive;
-    close_callback_t on_close;
+class comhandler_t {
+public:
+    virtual int onreceive(void *) = 0;
+    virtual int onclose() = 0;
 };
 
-class endpoint_t: public iohandler_t/*, 
-    public std::enable_shared_from_this<endpoint_t> */{
+class endpoint_t: 
+    public iohandler_t {
 public:
-    endpoint_t(SIDE_TYPE side, evloop_t *ep, int fd, endpoint_callbacks_t cbs):
+    endpoint_t(SIDE_TYPE side, evloop_t *ep, int fd, comhandler_t *ch):
         _side(side),
         _ep(ep), 
         _fd(fd),
-        _cbs(cbs),
+        _com(ch),
         _rb(2048), 
         _wb(4096){
     }
@@ -59,7 +57,7 @@ private:
     SIDE_TYPE _side;
     evloop_t *_ep;
     int _fd;
-    endpoint_callbacks_t _cbs;
+    comhandler_t *_com;
 
     buff_t _rb;
     buff_t _wb;

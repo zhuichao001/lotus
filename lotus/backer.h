@@ -10,7 +10,8 @@
 
 using namespace std;
 
-class backer_t {
+class backer_t:
+    public comhandler_t {
 public:
     backer_t(evloop_t *ep, int fd, const address_t *addr, service_t *svr):
         _ep(ep),
@@ -20,22 +21,18 @@ public:
     }
 
     int open(){
-        endpoint_callbacks_t cbs{
-            std::bind(&backer_t::receive, this, std::placeholders::_1),
-            std::bind(&backer_t::close, this),
-        };
-        _conn = new endpoint_t(SERVER_SIDE, _ep, _fd, cbs);
+        _conn = new endpoint_t(SERVER_SIDE, _ep, _fd, this);
         int err = _conn->open();
         fprintf(stderr, "fd:%d open iohandler\n", _conn->fd());
         return err;
     }
 
-    int close(){
+    int onclose(){
         delete this; //FIXME
         return 0;
     }
 
-    int receive(void *request){
+    int onreceive(void *request){
         request_t *req = static_cast<request_t*>(request);
         uint64_t msgid = req->msgid();
         fprintf(stderr, "receive msg:%d to process\n", msgid);
