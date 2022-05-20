@@ -42,8 +42,8 @@ int endpoint_t::read(){
 
 int endpoint_t::receive(){
     if(_side==SERVER_SIDE){
-        request_t *req = new request_t();
-        int n = req->decode(&_rb);
+        request_t req;
+        int n = req.decode(&_rb);
         if(n<0){ //failed
             fprintf(stderr, "Error: request decode failed\n");
             return -1;
@@ -52,7 +52,7 @@ int endpoint_t::receive(){
         }else{ //ok
             _rb.release(n);
         }
-        _com->onreceive(req);
+        _com->onreceive(&req);
         return 1; //1 indicate: continuously receive in evloop
     }else{ //CLIENT SIDE
         response_t rsp;

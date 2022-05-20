@@ -30,35 +30,42 @@ public:
     }
 
     int onclose(){
+        for(auto it : _sessions){
+            int msgid = it.first;
+            session_t *session = it.second;
+            response_t rsp;
+            rsp.seterrcode(RPC_ERR_CONNCLOSE);
+            session->onreply(&rsp);
+            fprintf(stderr, "incomplete msgid:%ld CONN-CLOSE.\n", msgid);
+            session->_state = session_t::REPLY_CONNCLOSE;
+        }
         delete this; //FIXME
         return 0;
     }
 
     void ontimeout(uint64_t msgid){
-        fprintf(stderr, "msgid:%ld has been time-out.\n", msgid);
         auto it = _sessions.find(msgid);
         if(it==_sessions.end()){
             return;
         }
 
-        fprintf(stderr, "%ld timeout @ %ld\n", msgid, microsec());
+        fprintf(stderr, "msgid:%ld time-out @ %ld\n", msgid, microsec());
 
         session_t *session = it->second;
         if(!session->completed()){
             response_t rsp;
-            rsp.seterrcode(RPC_TIMEOUT);
+            rsp.seterrcode(RPC_ERR_TIMEOUT);
             session->onreply(&rsp);
             fprintf(stderr, "msgid:%ld TIME-OUT.\n", msgid);
             session->_state = session_t::REPLY_TIMEOUT;
         }
     }
 
-    int call(request_t *req,  RpcCallback callback, uint64_t us=2000000 /*timeout microsec*/){
+    int call(request_t *req,  RpcCallback callback, uint64_t us=5000000 /*timeout microsec*/){
         uint64_t msgid = req->msgid();
 
         _sessions[msgid] = new session_t(_conn, req); 
-        _sessions[msgid]->_callback = [=](response_t *rsp)->int{ //decorator
-
+        _sessions[msgid]->_callback = [=](request_t*req, response_t *rsp)->int{ //decorator
             fprintf(stderr, "%ld onreply @ %ld\n", msgid, microsec());
             auto it = _sessions.find(msgid);
             if(it==_sessions.end()){
@@ -71,7 +78,7 @@ public:
             }
             _sessions[msgid]->_state = session_t::REPLY_FINISH;
             fprintf(stderr, "msgid:%ld has replied NORMAL-DATA.\n", msgid);
-            return callback(rsp);
+            return callback(req, rsp);
         };
 
         fprintf(stderr, "before %ld call @ %ld\n", msgid, microsec());
@@ -97,7 +104,8 @@ public:
     
         iter->second->onreply(rsp);
     
-        delete iter->second;
+        session_t *session = iter->second;
+        delete session;
         _sessions.erase(msgid);
         return 1;
     }

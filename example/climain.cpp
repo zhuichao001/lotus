@@ -5,12 +5,13 @@
 #include "engine.h"
 #include "dialer.h"
 
-int rpcdone(response_t *rsp){
+int rpcdone(request_t *req, response_t *rsp){
     if(rsp->errcode()!=0){
         fprintf(stderr, "rpc failed, response error code:[%d]\n", rsp->errcode());
         return -1;
     }
     fprintf(stderr, "call rpc done, response:[%s]\n", rsp->data());
+    delete req;
     return 0;
 }
 

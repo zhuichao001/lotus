@@ -75,8 +75,9 @@ public:
 };
 
 enum ErrorCode{
-    OK = 0,
-    RPC_TIMEOUT = -101
+    RPC_OK = 0,
+    RPC_ERR_TIMEOUT = -101,
+    RPC_ERR_CONNCLOSE = -102
 };
 
 class response_t : public message_t{
@@ -86,7 +87,7 @@ public:
         _errcode(0){
     }
 
-    response_t(const char* body, int len, int err=OK):
+    response_t(const char* body, int len, int err=RPC_OK):
         message_t(TYPE_RESPONSE, 128){
         _errcode = err;
         setbody(body, len);
@@ -104,6 +105,6 @@ private:
     int32_t _errcode;
 };
 
-typedef std::function<int(response_t *)> RpcCallback;
+typedef std::function<int(request_t*, response_t *)> RpcCallback;
 
 #endif

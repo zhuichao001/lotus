@@ -12,6 +12,7 @@ public:
         WAIT_REPLY = 1,
         REPLY_TIMEOUT = 2,
         REPLY_FINISH = 3,
+        REPLY_CONNCLOSE = 3,
     } _state;
 
     endpoint_t *_conn;
@@ -33,6 +34,10 @@ public:
 
     //for server side
     int reply(response_t *rsp){
+        if(_state==REPLY_CONNCLOSE){
+            return -1;
+        }
+
         rsp->setmsgid(_req->msgid());
 
         buff_t buf(2048);
@@ -46,11 +51,13 @@ public:
         if(_callback==nullptr){
             return 0;
         }
-        return _callback(rsp);
+        return _callback(_req, rsp); //RPC Response
     }
 
     bool completed(){
-        return _state==REPLY_TIMEOUT || _state==REPLY_FINISH;
+        return _state==REPLY_TIMEOUT || 
+                _state==REPLY_CONNCLOSE ||
+                _state==REPLY_FINISH;
     }
 
 };

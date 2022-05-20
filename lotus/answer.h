@@ -10,14 +10,23 @@
 
 using namespace std;
 
-class backer_t:
+class answer_t:
     public comhandler_t {
 public:
-    backer_t(evloop_t *ep, int fd, const address_t *addr, service_t *svr):
+    answer_t(evloop_t *ep, int fd, const address_t *addr, service_t *svr):
         _ep(ep),
         _fd(fd),
         _addr(addr),
         _svr(svr){
+    }
+
+    ~answer_t(){
+        for(auto it : _sessions){
+            int msgid = it.first;
+            delete _sessions[msgid];
+            _sessions.erase(msgid);
+        }
+        delete _conn;
     }
 
     int open(){
@@ -28,7 +37,7 @@ public:
     }
 
     int onclose(){
-        delete this; //FIXME
+        delete this;
         return 0;
     }
 
@@ -38,6 +47,10 @@ public:
         fprintf(stderr, "receive msg:%d to process\n", msgid);
         _sessions[msgid] = new session_t(_conn, req); 
         _svr->process(_sessions[msgid]);
+
+        delete _sessions[msgid];
+        _sessions.erase(msgid);
+
         return 0;
     }
 

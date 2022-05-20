@@ -4,14 +4,14 @@
 #include "socket.h"
 #include "address.h"
 #include "evloop.h"
-#include "backer.h"
+#include "answer.h"
 
 int acceptor_t::open(){
     _fd = socket(AF_INET, SOCK_STREAM,0);
     assert(_fd>0);
 
-    set_unblocking(_fd, 1);
     set_reuseaddr(_fd, 1);
+    set_unblocking(_fd, 1);
     fprintf(stderr, "fd:%d bind address:[%s:%d]\n", _fd, _addr->ip.c_str(), _addr->port);
 
     bind_address(_fd, _addr->ip.c_str(), _addr->port);
@@ -28,7 +28,7 @@ int acceptor_t::close() {
 int acceptor_t::read() {
     while(true){
         int fd = ::accept(_fd);
-        if(errno==EAGAIN){
+        if(fd==0 && errno==EAGAIN){
             return 0;
         } else if(fd==-1){
             return -1;
@@ -37,7 +37,7 @@ int acceptor_t::read() {
 
         address_t *addr = new address_t;
         get_peer_ip_port(_fd, &(addr->ip), &(addr->port));
-        backer_t *h = new backer_t(_ep, fd, addr, _svr);
+        answer_t *h = new answer_t(_ep, fd, addr, _svr);
         h->open();
     }
     return 0;

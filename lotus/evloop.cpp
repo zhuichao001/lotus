@@ -26,7 +26,7 @@ void evloop_t::post(task_t t){
 
 int evloop_t::loop(){
     struct epoll_event events[1024];
-    int n = epoll_wait(_efd, events, 1024, 1); //wait at most 2ms
+    int n = epoll_wait(_efd, events, 1024, 1); //wait at most 1ms
     if(n==-1){
         return -1;
     }
@@ -34,9 +34,8 @@ int evloop_t::loop(){
     for(int i=0; i<n; ++i){
         iohandler_t *h = static_cast<iohandler_t *>(events[i].data.ptr);
         if(events[i].events & EPOLLIN){
-            //fprintf(stderr, "EPOLLIN event from \n");
             if(h->read() < 0){
-                //fprintf(stderr, "EPOLLIN event read() failed \n");
+                fprintf(stderr, "EPOLLIN event read() failed \n");
                 delete h;
                 continue;
             }
