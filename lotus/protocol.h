@@ -10,9 +10,9 @@
 #include "endpoint.h"
 
 enum MESSAGE_TYPE{
-    TYPE_REQUEST=0,
-    TYPE_RESPONSE,
-    TYPE_HEARTBEAT
+    TYPE_REQUEST=1,
+    TYPE_RESPONSE=2,
+    TYPE_HEARTBEAT=3
 };
 
 class message_t{
