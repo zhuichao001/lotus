@@ -21,8 +21,6 @@ int endpoint_t::open(){
 }
 
 int endpoint_t::close(){
-    _com->onclose();
-
     _wb.reset();
     _rb.reset();
 
@@ -31,6 +29,8 @@ int endpoint_t::close(){
         ::close(_fd);
     }
     _fd = -1;
+
+    _com->onclose();
     return 0;
 }
 

@@ -27,10 +27,6 @@ public:
         _wb(4096){
     }
 
-    ~endpoint_t(){
-        close();
-    }
-
     int open();
 
     int close();

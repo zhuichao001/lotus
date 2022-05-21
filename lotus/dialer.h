@@ -10,7 +10,8 @@
 using namespace std;
 
 class dialer_t:
-    public comhandler_t {
+    public comhandler_t,
+    public std::enable_shared_from_this<dialer_t> {
 public:
     dialer_t(evloop_t *ep, const address_t *addr, timedriver_t *td):
         _ep(ep),
@@ -35,11 +36,15 @@ public:
             session_t *session = it.second;
             response_t rsp;
             rsp.seterrcode(RPC_ERR_CONNCLOSE);
-            session->onreply(&rsp);
             fprintf(stderr, "incomplete msgid:%ld CONN-CLOSE.\n", msgid);
-            session->_state = session_t::REPLY_CONNCLOSE;
+            //session->_state = session_t::REPLY_CONNCLOSE;
+            session->onreply(&rsp);
+
+            delete session;
         }
-        delete this; //FIXME
+
+        SessionMap _;
+        _.swap(_sessions);
         return 0;
     }
 
@@ -50,64 +55,63 @@ public:
         }
 
         fprintf(stderr, "msgid:%ld time-out @ %ld\n", msgid, microsec());
-
         session_t *session = it->second;
         if(!session->completed()){
             response_t rsp;
             rsp.seterrcode(RPC_ERR_TIMEOUT);
             session->onreply(&rsp);
-            fprintf(stderr, "msgid:%ld TIME-OUT.\n", msgid);
-            session->_state = session_t::REPLY_TIMEOUT;
         }
+
+        delete session;
+        _sessions.erase(it);
     }
 
-    int call(request_t *req,  RpcCallback callback, uint64_t us=5000000 /*timeout microsec*/){
+    int onreceive(void *response){
+        response_t *rsp = static_cast<response_t*>(response);
+        const uint64_t msgid = rsp->msgid();
+        auto it = _sessions.find(msgid);
+        if(it == _sessions.end()){
+            return -1;
+        }
+        session_t *session = it->second;
+        session->onreply(rsp);
+
+        delete session;
+        _sessions.erase(it);
+        return 0;
+    }
+
+    int call(request_t *req,  RpcCallback callback, uint64_t us=4000000 /*timeout microsec*/){
         uint64_t msgid = req->msgid();
 
         _sessions[msgid] = new session_t(_conn, req); 
+        _sessions[msgid]->_state = session_t::WAIT_REPLY;
+        _sessions[msgid]->_rpcat = microsec();
         _sessions[msgid]->_callback = [=](request_t*req, response_t *rsp)->int{ //decorator
-            fprintf(stderr, "%ld onreply @ %ld\n", msgid, microsec());
             auto it = _sessions.find(msgid);
             if(it==_sessions.end()){
                 fprintf(stderr, "msgid:%ld has been erased.\n", msgid);
                 return -1;
             }
-            if(_sessions[msgid]->completed()){
+
+            session_t *session = it->second;
+            if(session->completed()){
                 fprintf(stderr, "msgid:%ld has been completed.\n", msgid);
                 return -1;
             }
-            _sessions[msgid]->_state = session_t::REPLY_FINISH;
-            fprintf(stderr, "msgid:%ld has replied NORMAL-DATA.\n", msgid);
-            return callback(req, rsp);
+            session->_state = session_t::REPLY_FINISH;
+            int err =  callback(req, rsp);
+            return err;
         };
 
-        fprintf(stderr, "before %ld call @ %ld\n", msgid, microsec());
-        _sessions[msgid]->_state = session_t::WAIT_REPLY;
-        _sessions[msgid]->_rpcat = microsec();
-        _watcher->run_after(std::bind(&dialer_t::ontimeout, this, msgid), us);
+        _watcher->run_after(std::bind(&dialer_t::ontimeout, shared_from_this(), msgid), us);
 
-        fprintf(stderr, "%ld call @ %ld\n", msgid, microsec());
+        fprintf(stderr, "dilaer call msg:%ld @ %ld\n", msgid, microsec());
 
         buff_t buf(2048);
         req->encode(&buf);
         _conn->send(&buf);
         return 0;
-    }
-
-    int onreceive(void *response){
-        response_t *rsp = static_cast<response_t*>(response);
-        uint64_t msgid = rsp->msgid();
-        auto iter = _sessions.find(msgid);
-        if(iter == _sessions.end()){
-            return -1;
-        }
-    
-        iter->second->onreply(rsp);
-    
-        session_t *session = iter->second;
-        delete session;
-        _sessions.erase(msgid);
-        return 1;
     }
 
     int fd() {

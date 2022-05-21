@@ -24,7 +24,6 @@ public:
         for(auto it : _sessions){
             int msgid = it.first;
             delete _sessions[msgid];
-            _sessions.erase(msgid);
         }
         delete _conn;
     }

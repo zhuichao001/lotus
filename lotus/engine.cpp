@@ -10,9 +10,6 @@ engine_t::~engine_t(){
     for(auto it : _listeners){
         delete(it.second);
     }
-    for(auto it : _clients){
-        delete(it.second);
-    }
     delete _tracker;
     delete _ep;
 }
@@ -34,14 +31,12 @@ void engine_t::stop(){
 }
 
 //boot new client
-dialer_t * engine_t::open(const address_t *addr){
-    dialer_t *cli = new dialer_t(_ep, addr, this);
+std::shared_ptr<dialer_t> engine_t::dial(const address_t *addr){
+    auto cli = std::make_shared<dialer_t>(_ep, addr, this);
     cli->open();
     if(cli->usable()){
-        _clients[cli->fd()] = cli;
         return cli;
     } else {
-        delete cli;
         return nullptr;
     }
 }

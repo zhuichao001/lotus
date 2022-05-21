@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
     });
 
     address_t addr((const char*)"127.0.0.1", 8001);
-    dialer_t *cli = eng.open(&addr);
+    std::shared_ptr<dialer_t> cli = eng.dial(&addr);
     fprintf(stderr, "client [%s] boot up.\n", "127.0.0.1:8001");
 
     fprintf(stderr, "N:%d\n", N);

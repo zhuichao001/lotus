@@ -35,7 +35,7 @@ public:
     void heartbeat();
 
     //boot new client
-    dialer_t * open(const address_t *addr);
+    std::shared_ptr<dialer_t> dial(const address_t *addr);
 
     //boot new server
     int start(const address_t *addr, service_t* svr);
@@ -53,7 +53,6 @@ public:
 private:
     bool _stat; //running, closing, closed
     std::map<int, acceptor_t*> _listeners;
-    std::map<int, dialer_t*> _clients;
     evloop_t *_ep;
     timetracker_t *_tracker;
     bool _running;
