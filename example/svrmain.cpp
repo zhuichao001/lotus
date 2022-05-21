@@ -7,7 +7,7 @@ class rpc_service_t: public service_t{
 public:
     int process(session_t *ses){
         fprintf(stderr, "rpc server process req=%s\n", ses->request()->data()); 
-        sleep(10); // simulate caculate duration
+        sleep(1); // simulate caculate duration
         response_t rsp(ses->request()->data(), ses->request()->len());
         ses->reply(&rsp);
         return 0;
