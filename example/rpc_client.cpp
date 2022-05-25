@@ -5,7 +5,7 @@
 #include "engine.h"
 #include "dialer.h"
 
-int rpcdone(request_t *req, response_t *rsp){
+int rpcdone(rpc_request_t *req, rpc_response_t *rsp){
     if(rsp->errcode()!=0){
         fprintf(stderr, "rpc failed, response error code:[%d]\n", rsp->errcode());
         return -1;
@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
 
     fprintf(stderr, "N:%d\n", N);
     for(int i=0; i<N; ++i){
-        request_t *req = new request_t;
+        rpc_request_t *req = new rpc_request_t;
         const char *s = "test, 123!";
         req->setbody(s, strlen(s));
 

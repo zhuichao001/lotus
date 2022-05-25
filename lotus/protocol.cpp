@@ -1,8 +1,8 @@
 #include "protocol.h"
 
-int message_t::base_msgid = 1000000;
+int rpc_message_t::base_msgid = 1000000;
 
-int message_t::encode(buff_t *to)const{
+int rpc_message_t::encode(buff_t *to)const{
     char *dest = to->data();
     dest[0] = _msgtype;
 
@@ -24,7 +24,7 @@ int message_t::encode(buff_t *to)const{
     return msglen;
 }
 
-int message_t::decode(buff_t *from){
+int rpc_message_t::decode(buff_t *from){
     if(from->len()<13){
         //fprintf(stderr, "warning: buff len:%d is too less\n", from->len());
         return 0;

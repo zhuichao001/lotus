@@ -15,12 +15,12 @@ public:
         REPLY_CONNCLOSE = 3,
     } _state;
 
-    endpoint_t *_conn;
-    request_t *_req;
+    endpoint_t<rpc_request_t, rpc_response_t> *_conn;
+    rpc_request_t *_req;
     RpcCallback _callback;
     uint64_t  _rpcat; //start time
 
-    session_t(endpoint_t *conn, request_t *req):
+    session_t(endpoint_t<rpc_request_t, rpc_response_t> *conn, rpc_request_t *req):
         _conn(conn),
         _req(req){
         _callback = nullptr;
@@ -28,12 +28,12 @@ public:
         _state = UNKNOWN;
     }
 
-    request_t *request(){
+    rpc_request_t *request(){
         return _req;
     }
 
     //for server side
-    int reply(response_t *rsp){
+    int reply(rpc_response_t *rsp){
         if(_state==REPLY_CONNCLOSE){
             return -1;
         }
@@ -47,7 +47,7 @@ public:
     }
 
     //for client side
-    int onreply(response_t *rsp){
+    int onreply(rpc_response_t *rsp){
         if(_callback==nullptr){
             return 0;
         }

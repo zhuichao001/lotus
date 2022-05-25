@@ -25,7 +25,7 @@ public:
             return -1;
         }
 
-        _conn = new endpoint_t(CLIENT_SIDE, _ep, fd, this);
+        _conn = new endpoint_t<rpc_request_t, rpc_response_t>(side_type_t::CLIENT_SIDE, _ep, fd, this);
         _conn->open();
         return 0;
     }
@@ -34,7 +34,7 @@ public:
         for(auto it : _sessions){
             int msgid = it.first;
             session_t *session = it.second;
-            response_t rsp;
+            rpc_response_t rsp;
             rsp.seterrcode(RPC_ERR_CONNCLOSE);
             fprintf(stderr, "incomplete msgid:%ld CONN-CLOSE.\n", msgid);
             //session->_state = session_t::REPLY_CONNCLOSE;
@@ -57,7 +57,7 @@ public:
         fprintf(stderr, "msgid:%ld time-out @ %ld\n", msgid, microsec());
         session_t *session = it->second;
         if(!session->completed()){
-            response_t rsp;
+            rpc_response_t rsp;
             rsp.seterrcode(RPC_ERR_TIMEOUT);
             session->onreply(&rsp);
         }
@@ -67,7 +67,7 @@ public:
     }
 
     int onreceive(void *response){
-        response_t *rsp = static_cast<response_t*>(response);
+        rpc_response_t *rsp = static_cast<rpc_response_t*>(response);
         const uint64_t msgid = rsp->msgid();
         auto it = _sessions.find(msgid);
         if(it == _sessions.end()){
@@ -81,13 +81,13 @@ public:
         return 0;
     }
 
-    int call(request_t *req,  RpcCallback callback, uint64_t us=4000000 /*timeout microsec*/){
+    int call(rpc_request_t *req,  RpcCallback callback, uint64_t us=4000000 /*timeout microsec*/){
         uint64_t msgid = req->msgid();
 
         _sessions[msgid] = new session_t(_conn, req); 
         _sessions[msgid]->_state = session_t::WAIT_REPLY;
         _sessions[msgid]->_rpcat = microsec();
-        _sessions[msgid]->_callback = [=](request_t*req, response_t *rsp)->int{ //decorator
+        _sessions[msgid]->_callback = [=](rpc_request_t*req, rpc_response_t *rsp)->int{ //decorator
             auto it = _sessions.find(msgid);
             if(it==_sessions.end()){
                 fprintf(stderr, "msgid:%ld has been erased.\n", msgid);
@@ -126,7 +126,7 @@ private:
     evloop_t *_ep;
     const address_t *_addr;
     timedriver_t *_watcher;
-    endpoint_t *_conn;
+    endpoint_t<rpc_request_t, rpc_response_t> *_conn;
     SessionMap _sessions;
 };
 

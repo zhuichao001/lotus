@@ -29,7 +29,7 @@ public:
     }
 
     int open(){
-        _conn = new endpoint_t(SERVER_SIDE, _ep, _fd, this);
+        _conn = new endpoint_t<rpc_request_t, rpc_response_t>(side_type_t::SERVER_SIDE, _ep, _fd, this);
         int err = _conn->open();
         fprintf(stderr, "fd:%d open iohandler\n", _conn->fd());
         return err;
@@ -41,7 +41,7 @@ public:
     }
 
     int onreceive(void *request){
-        request_t *req = static_cast<request_t*>(request);
+        rpc_request_t *req = static_cast<rpc_request_t*>(request);
         uint64_t msgid = req->msgid();
         fprintf(stderr, "receive msg:%d to process\n", msgid);
         _sessions[msgid] = new session_t(_conn, req); 
@@ -49,7 +49,6 @@ public:
 
         delete _sessions[msgid];
         _sessions.erase(msgid);
-
         return 0;
     }
 
@@ -58,7 +57,7 @@ private:
     int _fd;
     const address_t *_addr;
     timedriver_t *_watcher;
-    endpoint_t *_conn;
+    endpoint_t<rpc_request_t, rpc_response_t> *_conn;
     service_t *_svr;
     SessionMap _sessions;
 };

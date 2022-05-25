@@ -15,15 +15,15 @@ enum MESSAGE_TYPE{
     TYPE_HEARTBEAT=3
 };
 
-class message_t{
+class rpc_message_t{
 public:
-    message_t(MESSAGE_TYPE type, int size):
+    rpc_message_t(MESSAGE_TYPE type, int size):
         _msgtype(type),
         _bodylen(0){
         _body = new buff_t(size);
     }
     
-    ~message_t(){
+    ~rpc_message_t(){
         delete _body;
     }
 
@@ -66,11 +66,11 @@ private:
     buff_t *_body;
 };
 
-class request_t : public message_t{
+class rpc_request_t : public rpc_message_t{
 public:
-    request_t():
-        message_t(TYPE_REQUEST, 128){
-        setmsgid(++message_t::base_msgid);
+    rpc_request_t():
+        rpc_message_t(TYPE_REQUEST, 128){
+        setmsgid(++rpc_message_t::base_msgid);
     }
 };
 
@@ -80,15 +80,15 @@ enum ErrorCode{
     RPC_ERR_CONNCLOSE = -102
 };
 
-class response_t : public message_t{
+class rpc_response_t : public rpc_message_t{
 public:
-    response_t():
-        message_t(TYPE_RESPONSE, 128),
+    rpc_response_t():
+        rpc_message_t(TYPE_RESPONSE, 128),
         _errcode(0){
     }
 
-    response_t(const char* body, int len, int err=RPC_OK):
-        message_t(TYPE_RESPONSE, 128){
+    rpc_response_t(const char* body, int len, int err=RPC_OK):
+        rpc_message_t(TYPE_RESPONSE, 128){
         _errcode = err;
         setbody(body, len);
     }
@@ -105,6 +105,6 @@ private:
     int32_t _errcode;
 };
 
-typedef std::function<int(request_t*, response_t *)> RpcCallback;
+typedef std::function<int(rpc_request_t*, rpc_response_t *)> RpcCallback;
 
 #endif

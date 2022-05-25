@@ -19,8 +19,8 @@ set(CXX_FLAGS
 include_directories(../lotus)
 add_subdirectory(../lotus lotus_lib_dir)
 
-add_executable(climain ./climain.cpp)
-target_link_libraries(climain lotus pthread)
+add_executable(rpc_server ./rpc_server.cpp)
+target_link_libraries(rpc_server lotus pthread)
 
-add_executable(svrmain ./svrmain.cpp)
-target_link_libraries(svrmain lotus pthread)
+add_executable(rpc_client ./rpc_client.cpp)
+target_link_libraries(rpc_client lotus pthread)
