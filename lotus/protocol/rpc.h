@@ -5,9 +5,8 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
-#include "buff.h"
-#include "util.h"
-#include "endpoint.h"
+#include "../buff.h"
+#include "../util.h"
 
 enum MESSAGE_TYPE{
     TYPE_REQUEST=1,
@@ -104,7 +103,5 @@ public:
 private:
     int32_t _errcode;
 };
-
-typedef std::function<int(rpc_request_t*, rpc_response_t *)> RpcCallback;
 
 #endif

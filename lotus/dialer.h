@@ -2,16 +2,20 @@
 #define _NET_DIALER_H_
 
 #include <ctime>
+#include "callback.h"
 #include "endpoint.h"
 #include "address.h"
 #include "session.h"
+#include "protocol/rpc.h"
 #include "util.h"
 
 using namespace std;
 
+
+template<typename REQUEST, typename RESPONSE>
 class dialer_t:
     public comhandler_t,
-    public std::enable_shared_from_this<dialer_t> {
+    public std::enable_shared_from_this<dialer_t<REQUEST, RESPONSE>> {
 public:
     dialer_t(evloop_t *ep, const address_t *addr, timedriver_t *td):
         _ep(ep),
@@ -25,7 +29,7 @@ public:
             return -1;
         }
 
-        _conn = new endpoint_t<rpc_request_t, rpc_response_t>(side_type_t::CLIENT_SIDE, _ep, fd, this);
+        _conn = new endpoint_t<REQUEST, RESPONSE>(side_type_t::CLIENT_SIDE, _ep, fd, this);
         _conn->open();
         return 0;
     }
@@ -33,17 +37,16 @@ public:
     int onclose(){
         for(auto it : _sessions){
             int msgid = it.first;
-            session_t *session = it.second;
+            session_t<REQUEST, RESPONSE> *session = it.second;
             rpc_response_t rsp;
             rsp.seterrcode(RPC_ERR_CONNCLOSE);
             fprintf(stderr, "incomplete msgid:%ld CONN-CLOSE.\n", msgid);
-            //session->_state = session_t::REPLY_CONNCLOSE;
             session->onreply(&rsp);
 
             delete session;
         }
 
-        SessionMap _;
+        SessionMap<REQUEST, RESPONSE> _;
         _.swap(_sessions);
         return 0;
     }
@@ -55,7 +58,7 @@ public:
         }
 
         fprintf(stderr, "msgid:%ld time-out @ %ld\n", msgid, microsec());
-        session_t *session = it->second;
+        session_t<REQUEST, RESPONSE> *session = it->second;
         if(!session->completed()){
             rpc_response_t rsp;
             rsp.seterrcode(RPC_ERR_TIMEOUT);
@@ -67,13 +70,13 @@ public:
     }
 
     int onreceive(void *response){
-        rpc_response_t *rsp = static_cast<rpc_response_t*>(response);
+        RESPONSE *rsp = static_cast<RESPONSE*>(response);
         const uint64_t msgid = rsp->msgid();
         auto it = _sessions.find(msgid);
         if(it == _sessions.end()){
             return -1;
         }
-        session_t *session = it->second;
+        session_t<REQUEST, RESPONSE> *session = it->second;
         session->onreply(rsp);
 
         delete session;
@@ -81,30 +84,30 @@ public:
         return 0;
     }
 
-    int call(rpc_request_t *req,  RpcCallback callback, uint64_t us=4000000 /*timeout microsec*/){
+    int call(REQUEST *req,  SessionCallback<REQUEST, RESPONSE> callback, uint64_t us=4000000 /*timeout microsec*/){
         uint64_t msgid = req->msgid();
 
-        _sessions[msgid] = new session_t(_conn, req); 
-        _sessions[msgid]->_state = session_t::WAIT_REPLY;
+        _sessions[msgid] = new session_t<REQUEST, RESPONSE>(_conn, req); 
+        _sessions[msgid]->_state = session_state_t::WAIT_REPLY;
         _sessions[msgid]->_rpcat = microsec();
-        _sessions[msgid]->_callback = [=](rpc_request_t*req, rpc_response_t *rsp)->int{ //decorator
+        _sessions[msgid]->_callback = [=](REQUEST *req, RESPONSE *rsp)->int{ //decorator
             auto it = _sessions.find(msgid);
             if(it==_sessions.end()){
                 fprintf(stderr, "msgid:%ld has been erased.\n", msgid);
                 return -1;
             }
 
-            session_t *session = it->second;
+            session_t<REQUEST, RESPONSE> *session = it->second;
             if(session->completed()){
                 fprintf(stderr, "msgid:%ld has been completed.\n", msgid);
                 return -1;
             }
-            session->_state = session_t::REPLY_FINISH;
+            session->_state = session_state_t::REPLY_FINISH;
             int err =  callback(req, rsp);
             return err;
         };
 
-        _watcher->run_after(std::bind(&dialer_t::ontimeout, shared_from_this(), msgid), us);
+        _watcher->run_after(std::bind(&dialer_t<REQUEST, RESPONSE>::ontimeout, this->shared_from_this(), msgid), us);
 
         fprintf(stderr, "dilaer call msg:%ld @ %ld\n", msgid, microsec());
 
@@ -126,8 +129,8 @@ private:
     evloop_t *_ep;
     const address_t *_addr;
     timedriver_t *_watcher;
-    endpoint_t<rpc_request_t, rpc_response_t> *_conn;
-    SessionMap _sessions;
+    endpoint_t<REQUEST, RESPONSE> *_conn;
+    SessionMap<REQUEST, RESPONSE> _sessions;
 };
 
 #endif

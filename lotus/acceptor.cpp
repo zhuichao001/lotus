@@ -35,10 +35,7 @@ int acceptor_t::read() {
         }
         fprintf(stderr, "listenfd:%d accept client fd:%d.\n", _fd, fd);
 
-        address_t *addr = new address_t;
-        get_peer_ip_port(_fd, &(addr->ip), &(addr->port));
-        answer_t *h = new answer_t(_ep, fd, addr, _svr);
-        h->open();
+        _acceptcb(_ep, fd);
     }
     return 0;
 }

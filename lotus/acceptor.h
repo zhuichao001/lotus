@@ -10,15 +10,16 @@
 #include "address.h"
 #include "buff.h"
 #include "evloop.h"
+#include "callback.h"
 #include "service.h"
 
 class acceptor_t: public iohandler_t {
 public:
-    acceptor_t(evloop_t *ep, const address_t *addr, service_t *svr):
+    acceptor_t(evloop_t *ep, const address_t *addr, AcceptCallback cb):
         _ep(ep),
         _fd(-1),
         _addr(addr), 
-        _svr(svr){
+        _acceptcb(cb){
     }
 
     virtual ~acceptor_t() {
@@ -31,7 +32,7 @@ public:
 
     int read() override;
 
-    int write() override {return 0;}
+    int write() override { return 0; }
 
     int fd() { return _fd; }
 private:
@@ -40,7 +41,7 @@ private:
     evloop_t *_ep;
     int _fd;
     const address_t *_addr;
-    service_t *_svr;
+    AcceptCallback _acceptcb;
 };
 
 #endif

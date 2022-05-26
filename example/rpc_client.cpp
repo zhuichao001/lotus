@@ -1,7 +1,7 @@
 ﻿#include <stdlib.h>
 #include <stdio.h>
 #include <thread>
-#include "protocol.h"
+#include "protocol/rpc.h"
 #include "engine.h"
 #include "dialer.h"
 
@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
     });
 
     address_t addr((const char*)"127.0.0.1", 8001);
-    std::shared_ptr<dialer_t> cli = eng.dial(&addr);
+    std::shared_ptr<dialer_t<rpc_request_t, rpc_response_t>> cli = eng.dial<rpc_request_t, rpc_response_t>(&addr);
     fprintf(stderr, "client [%s] boot up.\n", "127.0.0.1:8001");
 
     fprintf(stderr, "N:%d\n", N);

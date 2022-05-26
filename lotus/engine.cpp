@@ -18,27 +18,8 @@ void engine_t::heartbeat(){
     fprintf(stderr, "[lotus] heartbeat clock at:%ld\n", microsec());
 }
 
-//boot new server
-int engine_t::start(const address_t *addr, service_t* svr){
-    acceptor_t *ac = new acceptor_t(_ep, addr, svr);
-    ac->open();
-    _listeners[ac->fd()] = ac;
-    return 0;
-}
-
 void engine_t::stop(){
     _running = false;
-}
-
-//boot new client
-std::shared_ptr<dialer_t> engine_t::dial(const address_t *addr){
-    auto cli = std::make_shared<dialer_t>(_ep, addr, this);
-    cli->open();
-    if(cli->usable()){
-        return cli;
-    } else {
-        return nullptr;
-    }
 }
 
 int engine_t::run(){

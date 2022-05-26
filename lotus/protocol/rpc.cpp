@@ -1,4 +1,4 @@
-#include "protocol.h"
+#include "rpc.h"
 
 int rpc_message_t::base_msgid = 1000000;
 

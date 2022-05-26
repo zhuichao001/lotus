@@ -6,18 +6,21 @@
 #include "endpoint.h"
 #include "address.h"
 #include "session.h"
+#include "callback.h"
 #include "util.h"
 
 using namespace std;
 
+
+template<typename REQUEST, typename RESPONSE>
 class answer_t:
     public comhandler_t {
 public:
-    answer_t(evloop_t *ep, int fd, const address_t *addr, service_t *svr):
+    answer_t(evloop_t *ep, int fd, const address_t *addr, ProcessCallback<REQUEST, RESPONSE> procb):
         _ep(ep),
         _fd(fd),
         _addr(addr),
-        _svr(svr){
+        _processcb(procb){
     }
 
     ~answer_t(){
@@ -29,7 +32,7 @@ public:
     }
 
     int open(){
-        _conn = new endpoint_t<rpc_request_t, rpc_response_t>(side_type_t::SERVER_SIDE, _ep, _fd, this);
+        _conn = new endpoint_t<REQUEST, RESPONSE>(side_type_t::SERVER_SIDE, _ep, _fd, this);
         int err = _conn->open();
         fprintf(stderr, "fd:%d open iohandler\n", _conn->fd());
         return err;
@@ -41,11 +44,11 @@ public:
     }
 
     int onreceive(void *request){
-        rpc_request_t *req = static_cast<rpc_request_t*>(request);
+        REQUEST *req = static_cast<REQUEST*>(request);
         uint64_t msgid = req->msgid();
         fprintf(stderr, "receive msg:%d to process\n", msgid);
-        _sessions[msgid] = new session_t(_conn, req); 
-        _svr->process(_sessions[msgid]);
+        _sessions[msgid] = new session_t<REQUEST, RESPONSE>(_conn, req); 
+        _processcb(_sessions[msgid]);
 
         delete _sessions[msgid];
         _sessions.erase(msgid);
@@ -57,9 +60,9 @@ private:
     int _fd;
     const address_t *_addr;
     timedriver_t *_watcher;
-    endpoint_t<rpc_request_t, rpc_response_t> *_conn;
-    service_t *_svr;
-    SessionMap _sessions;
+    ProcessCallback<REQUEST, RESPONSE> _processcb;
+    endpoint_t<REQUEST, RESPONSE> *_conn;
+    SessionMap<REQUEST, RESPONSE> _sessions;
 };
 
 #endif

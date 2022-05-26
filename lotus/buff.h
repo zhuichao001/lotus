@@ -6,7 +6,6 @@
 #include <assert.h>
 #include <memory.h>
 
-
 class buff_t {
 public:
     buff_t(int cap):

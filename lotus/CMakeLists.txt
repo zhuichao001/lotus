@@ -22,4 +22,5 @@ set(CXX_FLAGS
  )
 
 aux_source_directory(. DIR_LIB_LOTUS_SRCS)
-add_library(lotus STATIC ${DIR_LIB_LOTUS_SRCS})
+aux_source_directory(./protocol DIR_LIB_LOTUS_PROTOCOL_SRCS)
+add_library(lotus STATIC ${DIR_LIB_LOTUS_SRCS} ${DIR_LIB_LOTUS_PROTOCOL_SRCS})

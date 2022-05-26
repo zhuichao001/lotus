@@ -35,10 +35,25 @@ public:
     void heartbeat();
 
     //boot new client
-    std::shared_ptr<dialer_t> dial(const address_t *addr);
+    template<typename REQUEST, typename RESPONSE>
+    std::shared_ptr<dialer_t<REQUEST, RESPONSE>> dial(const address_t *addr){
+        auto cli = std::make_shared<dialer_t<REQUEST, RESPONSE>>(_ep, addr, this);
+        cli->open();
+        if(cli->usable()){
+            return cli;
+        } else {
+            return nullptr;
+        }
+    }
 
     //boot new server
-    int start(const address_t *addr, service_t* svr);
+    template<typename REQUEST, typename RESPONSE>
+    int start(const address_t *addr, service_t<REQUEST, RESPONSE>* svr){
+        acceptor_t *ac = new acceptor_t(_ep, addr, std::bind(&service_t<REQUEST, RESPONSE>::onconnect, svr, std::placeholders::_1, std::placeholders::_2));//std::bind(&service_t<REQUEST, RESPONSE>::onconnect, svr));
+        ac->open();
+        _listeners[ac->fd()] = ac;
+        return 0;
+    }
 
     void stop();
 

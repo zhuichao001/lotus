@@ -2,8 +2,11 @@
 #define _LOTUS_SESSION_H_
 
 #include <map>
-#include "callback.h"
 #include "timedriver.h"
+
+
+template<typename REQUEST, typename RESPONSE>
+typedef std::function<int(REQUEST*, RESPONSE*)> SessionCallback;
 
 
 enum class session_state_t{
@@ -29,7 +32,7 @@ public:
         _req(req){
         _callback = nullptr;
         _rpcat = millisec();
-        _state = session_state_t::UNKNOWN;
+        _state = UNKNOWN;
     }
 
     REQUEST *request(){
@@ -38,7 +41,7 @@ public:
 
     //for server side
     int reply(RESPONSE *rsp){
-        if(_state==session_state_t::REPLY_CONNCLOSE){
+        if(_state==REPLY_CONNCLOSE){
             return -1;
         }
 
@@ -59,14 +62,14 @@ public:
     }
 
     bool completed(){
-        return _state==session_state_t::REPLY_TIMEOUT || 
-                _state==session_state_t::REPLY_CONNCLOSE ||
-                _state==session_state_t::REPLY_FINISH;
+        return _state==REPLY_TIMEOUT || 
+                _state==REPLY_CONNCLOSE ||
+                _state==REPLY_FINISH;
     }
 
 };
 
 template<typename REQUEST, typename RESPONSE>
-using SessionMap = std::map<uint64_t, session_t<REQUEST, RESPONSE>*> ;
+typedef std::map<uint64_t, session_t<REQUEST, RESPONSE>*> SessionMap;
 
 #endif
