@@ -15,6 +15,9 @@ enum class session_state_t{
 } ;
 
 template<typename REQUEST, typename RESPONSE>
+class endpoint_t;
+
+template<typename REQUEST, typename RESPONSE>
 class session_t{
 public:
     session_state_t _state;

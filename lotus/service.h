@@ -10,9 +10,6 @@
 #include "callback.h"
 
 template<typename REQUEST, typename RESPONSE>
-class session_t;
-
-template<typename REQUEST, typename RESPONSE>
 class service_t {
 public:
     service_t(ProcessCallback<REQUEST, RESPONSE> proc):

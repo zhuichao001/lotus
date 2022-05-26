@@ -1,5 +1,4 @@
-#ifndef _NET_ENDPOINT_H_
-#define _NET_ENDPOINT_H_
+#pragma once
 
 #include <memory>
 #include "handler.h"
@@ -10,15 +9,20 @@
 #include "socket.h"
 #include "handler.h"
 
-enum class side_type_t{
-    CLIENT_SIDE = 1,
-    SERVER_SIDE = 2,
-};
+//enum class side_type_t{
+//    CLIENT_SIDE = 1,
+//    SERVER_SIDE = 2,
+//};
 
 template<typename REQUEST, typename RESPONSE>
 class endpoint_t: 
     public iohandler_t {
 public:
+    enum side_type_t{
+        CLIENT_SIDE = 1,
+        SERVER_SIDE = 2,
+    };
+
     endpoint_t(side_type_t side, evloop_t *ep, int fd, comhandler_t *ch):
         _side(side),
         _ep(ep), 
@@ -119,5 +123,3 @@ private:
     buff_t _rb;
     buff_t _wb;
 };
-
-#endif

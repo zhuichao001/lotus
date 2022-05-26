@@ -29,7 +29,7 @@ public:
             return -1;
         }
 
-        _conn = new endpoint_t<REQUEST, RESPONSE>(side_type_t::CLIENT_SIDE, _ep, fd, this);
+        _conn = new endpoint_t<REQUEST, RESPONSE>(endpoint_t<REQUEST, RESPONSE>::CLIENT_SIDE, _ep, fd, this);
         _conn->open();
         return 0;
     }

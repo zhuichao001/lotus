@@ -1,15 +1,12 @@
-#ifndef _NET_BACKER_H_
-#define _NET_BACKER_H_
+#pragma once
 
 #include <ctime>
 #include <functional>
-#include "endpoint.h"
 #include "address.h"
+#include "endpoint.h"
 #include "session.h"
 #include "callback.h"
 #include "util.h"
-
-using namespace std;
 
 
 template<typename REQUEST, typename RESPONSE>
@@ -32,7 +29,7 @@ public:
     }
 
     int open(){
-        _conn = new endpoint_t<REQUEST, RESPONSE>(side_type_t::SERVER_SIDE, _ep, _fd, this);
+        _conn = new endpoint_t<REQUEST, RESPONSE>(endpoint_t<REQUEST, RESPONSE>::SERVER_SIDE, _ep, _fd, this);
         int err = _conn->open();
         fprintf(stderr, "fd:%d open iohandler\n", _conn->fd());
         return err;
@@ -64,5 +61,3 @@ private:
     endpoint_t<REQUEST, RESPONSE> *_conn;
     SessionMap<REQUEST, RESPONSE> _sessions;
 };
-
-#endif
