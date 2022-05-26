@@ -37,9 +37,9 @@ const char *status_message(status_t &status){
     }
 }
 
-int http_request_t::encode(char *buf, int len){
+int http_request_t::encode(buff_t *buf){
     assert(buf!=nullptr);
-    sprintf(buf, "%s %s %s\r\n \
+    sprintf(buf->data(), "%s %s %s\r\n \
             Host:%s\r\n \
             Connection:%s\r\n \
             Accept:%s\r\n \
@@ -48,23 +48,26 @@ int http_request_t::encode(char *buf, int len){
             _host.c_str(),
             _keep_alive?"KEEP-ALIVE":"CLOSE",
             _accept);
-    const int buf_len = strlen(buf);
+    const int buf_len = strlen(buf->data());
     if(_body.size()>0){
-        sprintf(buf+buf_len, "Content-Type:%s\r\n \
+        sprintf(buf->data()+buf_len, "Content-Type:%s\r\n \
                 Content-Length:%d\r\n \
                 %s\r\n\0", 
                 APP_JSON, 
                 _body.size(),
                 _body.c_str());
     }else{
-        sprintf(buf+buf_len, "\r\n\0");
+        sprintf(buf->data()+buf_len, "\r\n\0");
     }
+
+    buf->expend(strlen(buf->data()));
+
     return 0;
 }
 
-int http_request_t::decode(const char *buf, int len){
+int http_request_t::decode(buff_t *buf){
     char tmp[512];
-    const char *raw = buf;
+    const char *raw = buf->data();
     if(copy_until(raw, " ", tmp, sizeof(tmp))<0){
         return -1;
     }
@@ -111,9 +114,9 @@ int http_request_t::decode(const char *buf, int len){
     return 0;
 }
 
-int http_response_t::encode(char *buf, int len){
+int http_response_t::encode(buff_t *buf){
     assert(buf!=nullptr);
-    sprintf(buf, "%s %d %s\r\n \
+    sprintf(buf->data(), "%s %d %s\r\n \
             Content-Type:%s\r\n \
             Content-Length:%d\r\n \
             \r\n \
@@ -125,9 +128,9 @@ int http_response_t::encode(char *buf, int len){
     return 0;
 }
 
-int http_response_t::decode(const char *buf, int len){
+int http_response_t::decode(buff_t *buf){
     char tmp[256];
-    const char *raw = buf;
+    const char *raw = buf->data();
     if(copy_until(raw, " ", tmp, sizeof(tmp))<0){
         return -1;
     }

@@ -18,9 +18,11 @@ int rpc_message_t::encode(buff_t *to)const{
         tmp_bodylen >>= 8;
     }
 
-    memcpy(dest+13, data(), len());
+    to->expend(13); //HEAD LENGTH
+
+    to->append(data(), len());
+
     const int msglen = 13+len();
-    to->expend(msglen);
     return msglen;
 }
 

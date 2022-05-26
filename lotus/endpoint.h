@@ -79,6 +79,7 @@ public:
     bool established(){
         return _fd>0;
     }
+
 private:
     int receive(){
         if(_side==side_type_t::SERVER_SIDE){

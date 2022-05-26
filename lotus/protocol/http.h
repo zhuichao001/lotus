@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string>
+#include "../buff.h"
 
 
 extern const char * http_version;
@@ -41,9 +42,9 @@ public:
         _keep_alive(alive){
     }
 
-    int encode(char *buf, int len);
+    int encode(buff_t *to);
 
-    int decode(const char *buf, int len);
+    int decode(buff_t *from);
 };
 
 enum status_t {
@@ -71,9 +72,9 @@ public:
         _content_len = _body.size();
     }
 
-    int encode(char *buf, int len);
+    int encode(buff_t *to);
 
-    int decode(const char *buf, int len);
+    int decode(buff_t *from);
 };
 
 #endif
