@@ -7,6 +7,7 @@
 #include "address.h"
 #include "socket.h"
 #include "answer.h"
+#include "callback.h"
 
 template<typename REQUEST, typename RESPONSE>
 class session_t;
@@ -14,6 +15,10 @@ class session_t;
 template<typename REQUEST, typename RESPONSE>
 class service_t {
 public:
+    service_t(ProcessCallback<REQUEST, RESPONSE> proc):
+        process(proc){
+    }
+
     int onconnect(evloop_t *ep, int fd){
         address_t *addr = new address_t;
         get_peer_ip_port(fd, &(addr->ip), &(addr->port));
@@ -22,8 +27,7 @@ public:
         return 0;
     }
 
-    int (*process)(session_t<REQUEST, RESPONSE> *se);
-    ~service_t() = default;
+    ProcessCallback<REQUEST, RESPONSE> process;
 };
 
 #endif

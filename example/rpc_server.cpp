@@ -17,8 +17,7 @@ int main(int argc, char *argv[]) {
     engine_t eng;
     address_t addr((const char*)"127.0.0.1", 8001);
 
-    auto *svr = new service_t<rpc_request_t, rpc_response_t>();
-    svr->process = process;
+    auto *svr = new service_t<rpc_request_t, rpc_response_t>(process);
     eng.start(&addr, svr);
     fprintf(stderr, "server [%s] boot up.\n", "127.0.0.1:8001");
     eng.run();
