@@ -1,5 +1,4 @@
-#ifndef _NET_ADDRESS_H_
-#define _NET_ADDRESS_H_
+#pragma once
 
 #include <string>
 
@@ -43,5 +42,3 @@ public:
     std::string ip; 
     int port;
 };
-
-#endif

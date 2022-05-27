@@ -1,5 +1,4 @@
-#ifndef _NET_SERVER_H_
-#define _NET_SERVER_H_
+#pragma once
 
 #include <stdio.h>
 #include <string.h>
@@ -26,5 +25,3 @@ public:
 
     ProcessCallback<REQUEST, RESPONSE> process;
 };
-
-#endif

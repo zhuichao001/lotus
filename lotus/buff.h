@@ -1,5 +1,4 @@
-#ifndef _NET_BUFFER_H_
-#define _NET_BUFFER_H_
+#pragma once
 
 #include <algorithm>
 #include <stdlib.h>
@@ -105,5 +104,3 @@ private:
     int _start;
     int _end;
 };
-
-#endif

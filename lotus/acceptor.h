@@ -1,5 +1,4 @@
-#ifndef _NET_ACCEPTION_H_
-#define _NET_ACCEPTION_H_
+#pragma once
 
 #include <sys/epoll.h>
 #include <stdlib.h>
@@ -43,5 +42,3 @@ private:
     const address_t *_addr;
     AcceptCallback _acceptcb;
 };
-
-#endif

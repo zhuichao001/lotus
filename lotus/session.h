@@ -1,5 +1,4 @@
-#ifndef _LOTUS_SESSION_H_
-#define _LOTUS_SESSION_H_
+#pragma once
 
 #include <map>
 #include "callback.h"
@@ -68,8 +67,3 @@ public:
     }
 
 };
-
-//template<typename REQUEST, typename RESPONSE>
-//using SessionMap = std::map<uint64_t, session_t<REQUEST, RESPONSE>*> ;
-
-#endif

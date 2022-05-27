@@ -1,5 +1,4 @@
-#ifndef _NET_PROTOCOL_H_
-#define _NET_PROTOCOL_H_
+#pragma once
 
 #include <functional>
 #include <string.h>
@@ -103,5 +102,3 @@ public:
 private:
     int32_t _errcode;
 };
-
-#endif

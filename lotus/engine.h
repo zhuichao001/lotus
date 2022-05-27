@@ -1,5 +1,4 @@
-#ifndef _NET_ENGINE_H
-#define _NET_ENGINE_H
+#pragma once
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -72,5 +71,3 @@ private:
     timetracker_t *_tracker;
     bool _running;
 };
-
-#endif

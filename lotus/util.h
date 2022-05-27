@@ -1,5 +1,4 @@
-#ifndef _LOTUS_NET_UTIL_H_
-#define _LOTUS_NET_UTIL_H_
+#pragma once
 
 #include <string>
 #include <time.h>
@@ -16,4 +15,3 @@ char *str2upper(char *data);
 
 //the length of `to` must be no less than `raw`
 int copy_until(const char* &raw, const char *end, char *to, int tolen);
-#endif

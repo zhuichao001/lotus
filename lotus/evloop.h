@@ -1,5 +1,4 @@
-#ifndef _NET_EPOLL_H_
-#define _NET_EPOLL_H_
+#pragma once
 
 #include <list>
 #include <sys/epoll.h>
@@ -23,5 +22,3 @@ private:
     int _efd;
     List<task_t> _pendings;
 };
-
-#endif

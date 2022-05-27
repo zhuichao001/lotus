@@ -1,5 +1,4 @@
-#ifndef _NET_IOHANDLER_H_
-#define _NET_IOHANDLER_H_
+#pragma once
 
 //for engine
 class iohandler_t {
@@ -15,5 +14,3 @@ public:
     virtual int onreceive(void *) = 0;
     virtual int onclose() = 0;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef _NET_DIALER_H_
-#define _NET_DIALER_H_
+#pragma once
 
 #include <ctime>
 #include "callback.h"
@@ -130,5 +129,3 @@ private:
     endpoint_t<REQUEST, RESPONSE> *_conn;
     std::map<uint64_t, session_t<REQUEST, RESPONSE> *> _sessions;
 };
-
-#endif

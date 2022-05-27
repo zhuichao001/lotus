@@ -1,5 +1,4 @@
-#ifndef _NET_SOCKET_H_
-#define _NET_SOCKET_H_
+#pragma once
 
 #include <stdio.h>
 #include <errno.h>
@@ -41,5 +40,3 @@ void get_peer_ip_port(int fd, std::string *ip, int *port);
 int get_tcpinfo(struct tcp_info *info);
 
 bool get_tcpinfo_string(int fd, char* buf, int len);
-
-#endif

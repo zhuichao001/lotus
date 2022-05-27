@@ -1,5 +1,4 @@
-#ifndef _NET_HTTP_H_
-#define _NET_HTTP_H_
+#pragma once
 
 #include <string.h>
 #include <stdio.h>
@@ -76,5 +75,3 @@ public:
 
     int decode(buff_t *from);
 };
-
-#endif

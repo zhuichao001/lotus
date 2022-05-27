@@ -1,5 +1,4 @@
-#ifndef _NET_TIMEDRIVER_H_
-#define _NET_TIMEDRIVER_H_
+#pragma once
 
 #include "types.h"
 #include "timer.h"
@@ -12,5 +11,3 @@ public:
     virtual lotus::timer_t *run_after(timer_callback_t cb, uint64_t us) =0;
     virtual lotus::timer_t *run_every(timer_callback_t cb, uint64_t us) =0;
 };
-
-#endif
