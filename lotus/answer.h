@@ -59,5 +59,5 @@ private:
     timedriver_t *_watcher;
     ProcessCallback<REQUEST, RESPONSE> _processcb;
     endpoint_t<REQUEST, RESPONSE> *_conn;
-    SessionMap<REQUEST, RESPONSE> _sessions;
+    std::map<uint64_t, session_t<REQUEST, RESPONSE> *> _sessions;
 };

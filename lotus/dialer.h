@@ -9,8 +9,6 @@
 #include "protocol/rpc.h"
 #include "util.h"
 
-using namespace std;
-
 
 template<typename REQUEST, typename RESPONSE>
 class dialer_t:
@@ -46,7 +44,7 @@ public:
             delete session;
         }
 
-        SessionMap<REQUEST, RESPONSE> _;
+        std::map<uint64_t, session_t<REQUEST, RESPONSE> *> _;
         _.swap(_sessions);
         return 0;
     }
@@ -130,7 +128,7 @@ private:
     const address_t *_addr;
     timedriver_t *_watcher;
     endpoint_t<REQUEST, RESPONSE> *_conn;
-    SessionMap<REQUEST, RESPONSE> _sessions;
+    std::map<uint64_t, session_t<REQUEST, RESPONSE> *> _sessions;
 };
 
 #endif

@@ -69,7 +69,7 @@ public:
 
 };
 
-template<typename REQUEST, typename RESPONSE>
-using SessionMap = std::map<uint64_t, session_t<REQUEST, RESPONSE>*> ;
+//template<typename REQUEST, typename RESPONSE>
+//using SessionMap = std::map<uint64_t, session_t<REQUEST, RESPONSE>*> ;
 
 #endif
