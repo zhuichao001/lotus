@@ -1,6 +1,6 @@
 #include "rpc.h"
 
-int rpc_message_t::base_msgid = 1000000;
+uint64_t rpc_request_t::BASE_MSGID = 10000000;
 
 int rpc_message_t::encode(buff_t *to)const{
     char *dest = to->data();

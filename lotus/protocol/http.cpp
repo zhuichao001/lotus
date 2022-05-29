@@ -1,6 +1,8 @@
 #include "../util.h"
 #include "http.h"
 
+uint64_t http_request_t::BASE_MSGID = 10000000;
+
 const char * http_version = "HTTP/1.1";
 
 const mime_t TEXT_HTML  = "text/html";

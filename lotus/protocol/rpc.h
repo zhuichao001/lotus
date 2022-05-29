@@ -4,21 +4,17 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdio.h>
+#include "message.h"
 #include "../buff.h"
 #include "../util.h"
 
-enum MESSAGE_TYPE{
-    TYPE_REQUEST=1,
-    TYPE_RESPONSE=2,
-    TYPE_HEARTBEAT=3
-};
-
-class rpc_message_t{
+class rpc_message_t:
+    public message_t {
 public:
-    rpc_message_t(MESSAGE_TYPE type, int size):
-        _msgtype(type),
+    rpc_message_t(MESSAGE_TYPE msgtype, int maxsize):
+        message_t(msgtype),
         _bodylen(0){
-        _body = new buff_t(size);
+        _body = new buff_t(maxsize);
     }
     
     ~rpc_message_t(){
@@ -37,14 +33,6 @@ public:
         return _body->len();
     }
 
-    uint64_t msgid()const{
-        return _msgid;
-    }
-
-    void setmsgid(uint64_t id){
-        _msgid = id;
-    }
-
     int write(const char *data, int len){
         _body->append(data, len);
         _bodylen += len;
@@ -55,11 +43,7 @@ public:
         write(body, len);
     }
 
-    static int base_msgid;
-
 private:
-    uint8_t _msgtype;
-    uint64_t _msgid;
     int32_t _bodylen;
     buff_t *_body;
 };
@@ -67,9 +51,11 @@ private:
 class rpc_request_t : public rpc_message_t{
 public:
     rpc_request_t():
-        rpc_message_t(TYPE_REQUEST, 128){
-        setmsgid(++rpc_message_t::base_msgid);
+        rpc_message_t(TYPE_REQUEST, 256){
+        setmsgid(++rpc_request_t::BASE_MSGID);
     }
+
+    static uint64_t BASE_MSGID;
 };
 
 enum ErrorCode{
@@ -81,7 +67,7 @@ enum ErrorCode{
 class rpc_response_t : public rpc_message_t{
 public:
     rpc_response_t():
-        rpc_message_t(TYPE_RESPONSE, 128),
+        rpc_message_t(TYPE_RESPONSE, 256),
         _errcode(0){
     }
 
