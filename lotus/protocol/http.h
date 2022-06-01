@@ -77,16 +77,25 @@ class http_response_t :
     std::string _body;
 public:
     http_response_t():
-        message_t(TYPE_RESPONSE){
-        //
+        message_t(TYPE_RESPONSE),
+        _status(OK),
+        _content_type(TEXT_PLAIN),
+        _content_len(0) {
     }
 
-    http_response_t(const status_t &status, const mime_t &content_type=TEXT_PLAIN, const std::string &body=""):
+    http_response_t(const status_t &status, const std::string &body="", const mime_t &content_type=TEXT_PLAIN):
         message_t(TYPE_RESPONSE),
         _status(status),
         _content_type(content_type),
         _body(body) {
         _content_len = _body.size();
+    }
+
+    void set_response(const status_t &status, const std::string &body="", const mime_t &content_type=TEXT_PLAIN){
+        _status = status;
+        _body = body;
+        _content_len = _body.size();
+        _content_type = content_type;
     }
 
     int encode(buff_t *to);
