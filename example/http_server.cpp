@@ -1,25 +1,21 @@
 ﻿#include <stdio.h>
-#include "engine.h"
-#include "service.h"
-#include "session.h"
+#include "lotus.h"
 
-class http_service_t: public service_t{
-public:
-    int process(session_t *ses){
-        fprintf(stderr, "rpc server process req=%s\n", ses->request()->data()); 
-        //...
-        sleep(1); // simulate caculate duration
-        response_t rsp(ses->request()->data(), ses->request()->len());
-        ses->reply(&rsp);
-        return 0;
-    }
-};
 
 int main(int argc, char *argv[]) {
+    auto *svr = new http_service_t([](http_session_t *ses) ->int {
+        fprintf(stderr, "http server process \n"); 
+        sleep(1); // simulate calculate duration
+        http_response_t rsp;
+        ses->reply(&rsp);
+        return 0;
+    });
+
     engine_t eng;
-    address_t addr((const char*)"127.0.0.1", 8081);
-    eng.start(&addr, new rpc_service_t());
-    fprintf(stderr, "server [%s] boot up.\n", "127.0.0.1:8081");
+    address_t addr((const char*)"127.0.0.1", 8080);
+
+    eng.start(&addr, svr);
+    fprintf(stderr, "server [%s] boot up.\n", "127.0.0.1:8080");
     eng.run();
     return 0;
 }

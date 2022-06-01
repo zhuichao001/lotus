@@ -1,19 +1,8 @@
 ﻿#include <stdlib.h>
 #include <stdio.h>
 #include <thread>
-#include "protocol/rpc.h"
-#include "engine.h"
-#include "dialer.h"
+#include "lotus.h"
 
-int rpcdone(rpc_request_t *req, rpc_response_t *rsp){
-    if(rsp->errcode()!=0){
-        fprintf(stderr, "rpc failed, response error code:[%d]\n", rsp->errcode());
-        return -1;
-    }
-    fprintf(stderr, "call rpc done, response:[%s]\n", rsp->data());
-    delete req;
-    return 0;
-}
 
 int main(int argc, char *argv[]) {
     if(argc<2){
@@ -39,7 +28,15 @@ int main(int argc, char *argv[]) {
         req->setbody(s, strlen(s));
 
         fprintf(stderr, "cli call\n");
-        cli->call(req, rpcdone);
+        cli->call(req, [](rpc_request_t *req, rpc_response_t *rsp)->int{
+            if(rsp->errcode()!=0){
+                fprintf(stderr, "rpc failed, response error code:[%d]\n", rsp->errcode());
+                return -1;
+            }
+            fprintf(stderr, "call rpc done, response:[%s]\n", rsp->data());
+            delete req;
+            return 0;
+        });
     }
 
     th.join();
