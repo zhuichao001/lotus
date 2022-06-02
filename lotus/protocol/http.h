@@ -27,6 +27,7 @@ extern const method_t HEAD;
 
 class http_request_t :
     public message_t{
+public:
     method_t    _method;
     std::string _host;
     std::string _uri;
@@ -55,6 +56,12 @@ public:
     int encode(buff_t *to);
 
     int decode(buff_t *from);
+
+    void print(){
+        buff_t buf(512);     
+        this->encode(&buf);
+        fprintf(stderr, "print http_request_t------\n%s\n", buf.data());
+    }
 };
 
 enum status_t {
@@ -101,4 +108,10 @@ public:
     int encode(buff_t *to);
 
     int decode(buff_t *from);
+
+    void print(){
+        buff_t buf(512);     
+        encode(&buf);
+        fprintf(stderr, "print http_response_t------\n%s\n", buf.data());
+    }
 };

@@ -141,7 +141,6 @@ int bwrite(int fd, buff_t *wb){
         wb->load(&data, &len);
 
         int n = ::write(fd, (void *)data, (size_t)len);
-        //fprintf(stderr, "fd:%d write out %d byptes\n", fd, n);
         if (n<0 && errno == EAGAIN) { //tcp buffer is full
             fprintf(stderr,"fd:%d write EAGAIN.\n", fd);
             return 0;
@@ -150,13 +149,11 @@ int bwrite(int fd, buff_t *wb){
             return -1;
         } 
 
-        //fprintf(stderr, "ok write: %d bytes\n", len);
         wb->release(n); //return space
         if(n<len){
             break;
         }
     }
-    //fprintf(stderr, "return write\n");
     return 0;
 }
 

@@ -61,6 +61,11 @@ public:
     }
 
     int write() override{
+        if(_wb.empty()){
+            fprintf(stderr, "Warning: write empty\n");
+            return -1;
+        }
+
         if(!_wb.empty()){
             bwrite(_fd, &_wb);
         }

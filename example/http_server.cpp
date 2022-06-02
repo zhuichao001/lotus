@@ -4,10 +4,10 @@
 
 int main(int argc, char *argv[]) {
     auto *svr = new http_service_t([](http_session_t *ses) ->int {
-        fprintf(stderr, "http server process \n"); 
-        sleep(1); // simulate calculate duration
         http_response_t rsp;
         rsp.set_response(OK, "hello,world!");
+        rsp.print();
+
         ses->reply(&rsp);
         return 0;
     });

@@ -5,12 +5,12 @@ uint64_t http_request_t::BASE_MSGID = 10000000;
 
 const char * http_version = "HTTP/1.1";
 
-const mime_t TEXT_HTML  = "text/html";
-const mime_t TEXT_PLAIN = "text/plain";
-const mime_t TEXT_XML   = "text/xml";
-const mime_t IMG_PNG    = "image/png";
-const mime_t APP_JSON   = "application/json";
-const mime_t APP_FORM   = "x-www-form-urlencoded";
+const mime_t TEXT_HTML  = "TEXT/HTML";
+const mime_t TEXT_PLAIN = "TEXT/PLAIN";
+const mime_t TEXT_XML   = "TEXT/XML";
+const mime_t IMG_PNG    = "IMAGE/PNG";
+const mime_t APP_JSON   = "APPLICATION/JSON";
+const mime_t APP_FORM   = "X-WWW-FORM-URLENCODED";
 
 const method_t GET      = "GET";
 const method_t POST     = "POST";
@@ -41,23 +41,23 @@ const char *status_message(status_t &status){
 
 int http_request_t::encode(buff_t *buf){
     assert(buf!=nullptr);
-    sprintf(buf->data(), "%s %s %s\r\n \
-            Host:%s\r\n \
-            Connection:%s\r\n \
-            Accept:%s\r\n \
-            Accept-Charset:utf-8\r\n\0",
-            _method, _uri.c_str(), http_version, 
-            _host.c_str(),
-            _keep_alive?"KEEP-ALIVE":"CLOSE",
-            _accept);
+    sprintf(buf->data(), "%s %s %s\r\n\
+Host: %s\r\n\
+Connection: %s\r\n\
+Accept: %s\r\n\
+Accept-Charset: utf-8\r\n\0",
+        _method.c_str(), _uri.c_str(), http_version, 
+        _host.c_str(),
+        _keep_alive?"KEEP-ALIVE":"CLOSE",
+        _accept.c_str());
     const int buf_len = strlen(buf->data());
     if(_body.size()>0){
-        sprintf(buf->data()+buf_len, "Content-Type:%s\r\n \
-                Content-Length:%d\r\n \
-                %s\r\n\0", 
-                APP_JSON, 
-                _body.size(),
-                _body.c_str());
+        sprintf(buf->data()+buf_len, "Content-Type: %s\r\n\
+Content-Length: %d\r\n\
+%s\r\n\0", 
+            APP_JSON.c_str(), 
+            _body.size(),
+            _body.c_str());
     }else{
         sprintf(buf->data()+buf_len, "\r\n\0");
     }
@@ -71,33 +71,34 @@ int http_request_t::decode(buff_t *buf){
     char tmp[512];
     const char *raw = buf->data();
     if(copy_until(raw, " ", tmp, sizeof(tmp))<0){
-        return -1;
+        return 0;
     }
     _method = str2upper(tmp);
 
     if(copy_until(raw, " ", tmp, sizeof(tmp))<0){
-        return -1;
+        return 0;
     }
     _uri = tmp;
 
+    //ignore http version
     if(copy_until(raw, "\r\n", tmp, sizeof(tmp))<0){
-        return -1;
+        return 0;
     }
-    //ignore
 
     while(true){
-        if(copy_until(raw, ":", tmp, sizeof(tmp))<0){
-            return -1;
+        if(copy_until(raw, "\r\n", tmp, sizeof(tmp))<0){
+            return 0;
         }
         if(strlen(tmp)==0){
+            _body = tmp;
             break;
         }
 
         char key[64];
         char val[256];
         const char *tmp_raw = tmp;
-        copy_until(tmp_raw, ":", key, sizeof(tmp));
-        copy_until(tmp_raw, "\r\n", val, sizeof(tmp));
+        copy_until(tmp_raw, ": ", key, sizeof(key));
+        copy_until(tmp_raw, "\r\n", val, sizeof(val));
 
         if(strcasecmp(key, "Host")==0){
             _host = val;
@@ -111,22 +112,22 @@ int http_request_t::decode(buff_t *buf){
             _accept = str2upper(val);
         }
     }
-    copy_until(raw, "\0", tmp, sizeof(tmp));
-    _body = tmp;
-    return 0;
+    fprintf(stderr, "http_request_t decode success\n");
+    return buf->len(); //FIXME: split multi reqeust
 }
 
 int http_response_t::encode(buff_t *buf){
     assert(buf!=nullptr);
-    sprintf(buf->data(), "%s %d %s\r\n \
-            Content-Type:%s\r\n \
-            Content-Length:%d\r\n \
-            \r\n \
-            %s\0",
-            http_version, _status, status_message(_status), 
-            _content_type,
-            _body.size(),
-            _body.c_str());
+    sprintf(buf->data(), "%s %d %s\r\n\
+Content-Type: %s\r\n\
+Content-Length: %d\r\n\
+\r\n\
+%s\0",
+        http_version, _status, status_message(_status), 
+        _content_type.c_str(),
+        _body.size(),
+        _body.c_str());
+    buf->expend(strlen(buf->data()));
     return 0;
 }
 
@@ -159,8 +160,8 @@ int http_response_t::decode(buff_t *buf){
         char key[64];
         char val[256];
         const char *tmp_raw = tmp;
-        copy_until(tmp_raw, ":", key, sizeof(tmp));
-        copy_until(tmp_raw, "\r\n", val, sizeof(tmp));
+        copy_until(tmp_raw, ": ", key, sizeof(key));
+        copy_until(tmp_raw, "\r\n", val, sizeof(val));
 
         if(strcasecmp(key, "Content-Type")==0){
             _content_type = val;
@@ -171,9 +172,5 @@ int http_response_t::decode(buff_t *buf){
     copy_until(raw, "\0", tmp, sizeof(tmp));
     _body = tmp;
 
-    if(_body.size()==_content_len){
-        return 0;
-    }else{
-        return 1;
-    }
+    return buf->len();
 }

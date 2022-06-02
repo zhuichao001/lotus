@@ -41,6 +41,7 @@ public:
     //for server side
     int reply(RESPONSE *rsp){
         if(_state==session_state_t::REPLY_CONNCLOSE){
+            fprintf(stderr, "Failed reply, session state:REPLY_CONNCLOSE\n");
             return -1;
         }
 
@@ -48,6 +49,7 @@ public:
 
         buff_t buf(2048);
         rsp->encode(&buf);
+
         _conn->send(&buf);
         return 0;
     }

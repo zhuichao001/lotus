@@ -107,6 +107,7 @@ int copy_until(const char* &raw, const char *end, char *to, int tolen){
             }
         }
     }
+    to[k]='\0';
     raw = raw+i;
     return 0;
 }
