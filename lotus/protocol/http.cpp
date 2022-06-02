@@ -10,7 +10,7 @@ const mime_t TEXT_PLAIN = "TEXT/PLAIN";
 const mime_t TEXT_XML   = "TEXT/XML";
 const mime_t IMG_PNG    = "IMAGE/PNG";
 const mime_t APP_JSON   = "APPLICATION/JSON";
-const mime_t APP_FORM   = "X-WWW-FORM-URLENCODED";
+const mime_t WWW_FORM   = "X-WWW-FORM-URLENCODED";
 
 const method_t GET      = "GET";
 const method_t POST     = "POST";
