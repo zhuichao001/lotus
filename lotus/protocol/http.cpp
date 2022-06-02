@@ -41,20 +41,22 @@ const char *status_message(status_t &status){
 
 int http_request_t::encode(buff_t *buf){
     assert(buf!=nullptr);
-    sprintf(buf->data(), "%s %s %s\r\n\
-Host: %s\r\n\
-Connection: %s\r\n\
-Accept: %s\r\n\
-Accept-Charset: utf-8\r\n\0",
+    sprintf(buf->data(), 
+        "%s %s %s\r\n"
+        "Host: %s\r\n"
+        "Connection: %s\r\n"
+        "Accept: %s\r\n"
+        "Accept-Charset: utf-8\r\n\0",
         _method.c_str(), _uri.c_str(), http_version, 
         _host.c_str(),
         _keep_alive?"KEEP-ALIVE":"CLOSE",
         _accept.c_str());
     const int buf_len = strlen(buf->data());
     if(_body.size()>0){
-        sprintf(buf->data()+buf_len, "Content-Type: %s\r\n\
-Content-Length: %d\r\n\
-%s\r\n\0", 
+        sprintf(buf->data()+buf_len, 
+            "Content-Type: %s\r\n"
+            "Content-Length: %d\r\n"
+            "%s\r\n\0", 
             APP_JSON.c_str(), 
             _body.size(),
             _body.c_str());
@@ -118,11 +120,12 @@ int http_request_t::decode(buff_t *buf){
 
 int http_response_t::encode(buff_t *buf){
     assert(buf!=nullptr);
-    sprintf(buf->data(), "%s %d %s\r\n\
-Content-Type: %s\r\n\
-Content-Length: %d\r\n\
-\r\n\
-%s\0",
+    sprintf(buf->data(), 
+        "%s %d %s\r\n"
+        "Content-Type: %s\r\n"
+        "Content-Length: %d\r\n"
+        "\r\n"
+        "%s\0",
         http_version, _status, status_message(_status), 
         _content_type.c_str(),
         _body.size(),
