@@ -27,7 +27,6 @@ extern const method_t HEAD;
 
 class http_request_t :
     public message_t{
-public:
     method_t    _method;
     std::string _host;
     std::string _uri;
@@ -36,6 +35,13 @@ public:
     bool        _keep_alive;
 
     static uint64_t BASE_MSGID;
+public:
+    std::string Method(){ return _method; }
+    std::string Host(){ return _host; }
+    std::string Uri(){ return _uri; }
+    std::string Accept(){ return _accept; }
+    std::string Body(){ return _body; }
+    bool IsKeepAlive(){ return _keep_alive; }
 public:
     http_request_t():
         message_t(TYPE_REQUEST){
