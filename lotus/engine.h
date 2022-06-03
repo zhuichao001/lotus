@@ -58,11 +58,11 @@ public:
 
     int run();
 
-    lotus::timer_t *run_at(timer_callback_t cb, uint64_t when) override;
+    lotus::timer_t *run_at(uint64_t when, timer_callback_t cb) override;
 
-    lotus::timer_t *run_after(timer_callback_t cb, uint64_t delay) override;
+    lotus::timer_t *run_after(uint64_t delay, timer_callback_t cb) override;
     
-    lotus::timer_t *run_every(timer_callback_t cb, uint64_t interval) override;
+    lotus::timer_t *run_every(uint64_t interval, timer_callback_t cb) override;
 
 private:
     bool _stat; //running, closing, closed

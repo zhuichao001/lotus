@@ -104,7 +104,7 @@ public:
             return err;
         };
 
-        _watcher->run_after(std::bind(&dialer_t<REQUEST, RESPONSE>::ontimeout, this->shared_from_this(), msgid), us);
+        _watcher->run_after(us, std::bind(&dialer_t<REQUEST, RESPONSE>::ontimeout, this->shared_from_this(), msgid));
 
         fprintf(stderr, "dilaer call msg:%ld @ %ld\n", msgid, microsec());
 
