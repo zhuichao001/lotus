@@ -129,3 +129,5 @@ private:
     endpoint_t<REQUEST, RESPONSE> *_conn;
     std::map<uint64_t, session_t<REQUEST, RESPONSE> *> _sessions;
 };
+
+using rpc_dialer_t = dialer_t<rpc_request_t, rpc_response_t>;
