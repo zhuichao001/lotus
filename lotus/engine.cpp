@@ -43,7 +43,7 @@ lotus::timer_t *engine_t::run_after(uint64_t delay, timer_callback_t cb) {
 }
 
 lotus::timer_t *engine_t::run_every(uint64_t interval, timer_callback_t cb, bool immediately) {
-    uint64_t when = immediately ? microsec() : microsec()+interval;
+    uint64_t when = immediately ? microsec()+10000/*10ms*/ : microsec()+interval;
     lotus::timer_t* t = new lotus::timer_t(_tracker, cb, when, interval);
     _ep->post(std::bind(&timetracker_t::add, _tracker, t));
     return t;
