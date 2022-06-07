@@ -81,10 +81,10 @@ public:
         return 0;
     }
 
-    int call(REQUEST *req,  SessionCallback<REQUEST, RESPONSE> callback, uint64_t us=4000000 /*timeout microsec*/){
+    int call(REQUEST *req,  SessionCallback<REQUEST, RESPONSE> callback, uint64_t us=1000000 /*timeout: default 1 second*/){
         uint64_t msgid = req->msgid();
 
-        _sessions[msgid] = new session_t<REQUEST, RESPONSE>(_conn, req); 
+        _sessions[msgid] = new session_t<REQUEST, RESPONSE>(_conn, req);
         _sessions[msgid]->_state = session_state_t::WAIT_REPLY;
         _sessions[msgid]->_rpcat = microsec();
         _sessions[msgid]->_callback = [=](REQUEST *req, RESPONSE *rsp)->int{ //decorator
