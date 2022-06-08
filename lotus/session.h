@@ -45,16 +45,12 @@ public:
             return -1;
         }
 
-        fprintf(stderr, "reply test 1\n");
         rsp->setmsgid(_req->msgid());
-        fprintf(stderr, "reply test 2\n");
 
         buff_t buf(4096);
         rsp->encode(&buf);
-        fprintf(stderr, "reply test 3\n");
 
         _conn->send(&buf);
-        fprintf(stderr, "reply test 4\n");
         return 0;
     }
 
