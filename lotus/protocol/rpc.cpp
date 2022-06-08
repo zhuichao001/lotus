@@ -2,6 +2,8 @@
 
 uint64_t rpc_request_t::BASE_MSGID = 10000000;
 
+const int MSG_HEAD_LEN = 17;
+
 int rpc_message_t::encode(buff_t *to)const{
     char *dest = to->data();
     dest[0] = _msgtype;
@@ -12,23 +14,28 @@ int rpc_message_t::encode(buff_t *to)const{
         tmp_msgid >>= sizeof(uint64_t);
     }
 
-    uint32_t tmp_bodylen = _bodylen;
-    for(int i=0; i<sizeof(uint32_t); ++i){
-        dest[9+i] = tmp_bodylen & 0xff;
-        tmp_bodylen >>= 8;
+    int32_t tmp_errcode = _errcode;
+    for(int i=0; i<sizeof(int32_t); ++i){
+        dest[9+i] = tmp_errcode & 0xff;
+        tmp_errcode >>= 8;
     }
 
-    to->expend(13); //HEAD LENGTH
+    uint32_t tmp_bodylen = len();
+    for(int i=0; i<sizeof(uint32_t); ++i){
+        dest[13+i] = tmp_bodylen & 0xff;
+        tmp_bodylen >>= 8;
+    }
+    to->expend(MSG_HEAD_LEN); //update length after directly write
 
     to->append(data(), len());
 
-    const int msglen = 13+len();
+    const int msglen = MSG_HEAD_LEN+len();
     return msglen;
 }
 
 int rpc_message_t::decode(buff_t *from){
-    if(from->len()<13){
-        //fprintf(stderr, "warning: buff len:%d is too less\n", from->len());
+    if(from->len()<MSG_HEAD_LEN){
+        fprintf(stderr, "warning: buff len:%d is too less\n", from->len());
         return 0;
     }
 
@@ -40,12 +47,19 @@ int rpc_message_t::decode(buff_t *from){
         _msgid = (_msgid<<8) + uint8_t(data[8-i]);
     }
 
-    _bodylen = 0;
+    _errcode = 0;
+    for(int i=0; i<sizeof(int32_t); ++i){
+        _errcode = (_errcode<<8) + uint8_t(data[12-i]);
+    }
+
+    uint32_t bodylen = 0;
     for(int i=0; i<sizeof(uint32_t); ++i){
-        _bodylen = (_bodylen<<8) + uint8_t(data[12-i]);
+        bodylen = (bodylen<<8) + uint8_t(data[16-i]);
     }
 
     _body->reset();
-    _body->append(data+13, _bodylen);
-    return 13+_bodylen;
+    _body->append(data + MSG_HEAD_LEN, bodylen);
+
+    const int msglen = MSG_HEAD_LEN + bodylen;
+    return msglen;
 }

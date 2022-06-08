@@ -11,9 +11,9 @@
 class rpc_message_t:
     public message_t {
 public:
-    rpc_message_t(MESSAGE_TYPE msgtype, int maxsize):
+    rpc_message_t(MESSAGE_TYPE msgtype, const int maxsize=2048):
         message_t(msgtype),
-        _bodylen(0){
+        _errcode(0){
         _body = new buff_t(maxsize);
     }
     
@@ -35,7 +35,6 @@ public:
 
     int write(const char *data, int len){
         _body->append(data, len);
-        _bodylen += len;
         return len;
     }
 
@@ -43,8 +42,18 @@ public:
         write(body, len);
     }
 
+    void seterrcode(int32_t err){
+        _errcode = err;
+    }
+
+    int32_t errcode(){
+        return _errcode;
+    }
+
+protected:
+    int32_t _errcode; //only used by response message
+
 private:
-    int32_t _bodylen;
     buff_t *_body;
 };
 
@@ -67,8 +76,7 @@ enum ErrorCode{
 class rpc_response_t : public rpc_message_t{
 public:
     rpc_response_t():
-        rpc_message_t(TYPE_RESPONSE, 256),
-        _errcode(0){
+        rpc_message_t(TYPE_RESPONSE, 256) {
     }
 
     rpc_response_t(const char* body, int len, int err=RPC_OK):
@@ -76,15 +84,4 @@ public:
         _errcode = err;
         setbody(body, len);
     }
-
-    void seterrcode(int32_t err){
-        _errcode = err;
-    }
-
-    int32_t errcode(){
-        return _errcode;
-    }
-
-private:
-    int32_t _errcode;
 };
