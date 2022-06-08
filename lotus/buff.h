@@ -101,6 +101,7 @@ public:
 private:
     char *_buff;
     int _capacity;
+
     int _start;
     int _end;
 };

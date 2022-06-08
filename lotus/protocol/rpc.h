@@ -22,8 +22,10 @@ public:
     }
 
     int encode(buff_t *to)const;
+    int encode(std::string &dat)const;
 
     int decode(buff_t *from);
+    int decode(const char *data, int len);
 
     const char *data()const{
         return _body->data();
