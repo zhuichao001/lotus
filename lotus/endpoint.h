@@ -44,6 +44,8 @@ public:
         _wb.reset();
         _rb.reset();
 
+        fprintf(stderr, "endpoint closed, fd:%d\n", _fd);
+
         if(_fd>0){
             _ep->update(EPOLL_CTL_DEL, _fd, 0, nullptr);
             ::close(_fd);
@@ -76,6 +78,7 @@ public:
     }
 
     int send(buff_t *buf){
+        assert(buf!=nullptr);
         _wb.append(buf);
         write();
         return 0;

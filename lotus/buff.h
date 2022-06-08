@@ -78,6 +78,7 @@ public:
         if(slice==nullptr || size<=0){
             return -1;
         }
+
         int length = this->len();
         if(size > _capacity-_end){
             if(rest()>=size){

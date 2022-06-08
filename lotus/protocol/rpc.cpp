@@ -67,8 +67,9 @@ int rpc_message_t::decode(const char *data, int len){
         bodylen = (bodylen<<8) + uint8_t(data[16-i]);
     }
 
-    if(bodylen+MSG_HEAD_LEN < len){
-        fprintf(stderr, "message body not complete\n");
+    if(bodylen+MSG_HEAD_LEN > len){
+        fprintf(stderr, "message body not complete, bodylen:%d, MSG_HEAD_LEN:%d, len:%d\n", 
+                bodylen, MSG_HEAD_LEN, len);
         return 0;
     }
 
