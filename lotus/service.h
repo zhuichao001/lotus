@@ -16,8 +16,8 @@ public:
     }
 
     int onconnect(evloop_t *ep, int fd){
-        address_t *addr = new address_t;
-        get_peer_ip_port(fd, &(addr->ip), &(addr->port));
+        address_t addr;
+        get_peer_ip_port(fd, &(addr.ip), &(addr.port));
         answer_t<REQUEST, RESPONSE> *h = new answer_t<REQUEST, RESPONSE>(ep, fd, addr, this->process);
         h->open();
         return 0;

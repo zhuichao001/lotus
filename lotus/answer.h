@@ -3,6 +3,7 @@
 #include <ctime>
 #include <functional>
 #include "address.h"
+#include "socket.h"
 #include "endpoint.h"
 #include "session.h"
 #include "callback.h"
@@ -13,11 +14,11 @@ template<typename REQUEST, typename RESPONSE>
 class answer_t:
     public comhandler_t {
 public:
-    answer_t(evloop_t *ep, int fd, const address_t *addr, ProcessCallback<REQUEST, RESPONSE> procb):
+    answer_t(evloop_t *ep, int fd, ProcessCallback<REQUEST, RESPONSE> procb):
         _ep(ep),
         _fd(fd),
-        _addr(addr),
         _processcb(procb){
+        get_peer_ip_port(_fd, &(_addr.ip), &(_addr.port));
     }
 
     ~answer_t(){
@@ -54,8 +55,8 @@ public:
 
 private:
     evloop_t *_ep;
-    int _fd;
-    const address_t *_addr;
+    const int _fd;
+    address_t _addr;
     timedriver_t *_watcher;
     ProcessCallback<REQUEST, RESPONSE> _processcb;
     endpoint_t<REQUEST, RESPONSE> *_conn;
