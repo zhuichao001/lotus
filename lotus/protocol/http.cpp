@@ -65,7 +65,6 @@ int http_request_t::encode(buff_t *buf){
     }
 
     buf->expend(strlen(buf->data()));
-
     return 0;
 }
 

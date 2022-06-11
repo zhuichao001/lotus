@@ -9,7 +9,6 @@
 #include "callback.h"
 #include "util.h"
 
-
 template<typename REQUEST, typename RESPONSE>
 class answer_t:
     public comhandler_t {
