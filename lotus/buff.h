@@ -99,6 +99,30 @@ public:
         return 0;
     }
 
+    //litte endian
+    int write_le(uint64_t val, int bytes){
+        if(bytes>8){
+            return -1;
+        }
+        uint64_t leval=0;
+        unsigned char *p = (unsigned char *)&leval;
+        for(int i=0; i<bytes; ++i){
+            *p = val & 0xff;
+            val >>=8;
+        }
+        append((char*)&leval, bytes);
+        return 0;
+    }
+
+    //big endian
+    int write_be(uint64_t val, int bytes){
+        if(bytes>8){
+            return -1;
+        }
+        append((char*)&val+(sizeof(uint64_t)-bytes), bytes);
+        return 0;
+    }
+
 private:
     char *_buff;
     int _capacity;
