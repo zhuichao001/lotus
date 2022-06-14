@@ -2,7 +2,7 @@
 #include "../buff.h"
 
 
-int default_server_capabilities(){
+int server_capabilities(){
     int flag = 0;
     flag |= CLIENT_LONG_PASSWORD;
     flag |= CLIENT_FOUND_ROWS;
@@ -50,7 +50,6 @@ char *random_seed(int size){
     return seed;
 }
 
-                          
 mysql_packet_t::mysql_packet_t():
     packet_len(0),
     sequence_id(0){

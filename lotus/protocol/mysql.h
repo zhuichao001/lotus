@@ -264,8 +264,3 @@ public:
         fprintf(stderr, "print mysql_response_t------\n%s\n", buf.data());
     }
 };
-
-int server_capabilities();
-
-int read_lengthed_str(buff_t *from, char *dst);
-
