@@ -9,17 +9,13 @@
 #include "socket.h"
 #include "handler.h"
 
+
+
 template<typename REQUEST, typename RESPONSE>
 class endpoint_t: 
     public iohandler_t {
 public:
-    enum side_type_t{
-        CLIENT_SIDE = 1,
-        SERVER_SIDE = 2,
-    };
-
-    endpoint_t(side_type_t side, evloop_t *ep, int fd, comhandler_t *ch):
-        _side(side),
+    endpoint_t(evloop_t *ep, int fd, comhandler_t *ch):
         _ep(ep), 
         _fd(fd),
         _com(ch),
@@ -89,36 +85,9 @@ public:
 
 private:
     int receive(){
-        if(_side==side_type_t::SERVER_SIDE){
-            REQUEST req;
-            int n = req.decode(&_rb);
-            if(n<0){ //failed
-                fprintf(stderr, "Error: request decode failed\n");
-                return -1;
-            }else if(n==0){ //incomplete
-                return 0;
-            }else{ //ok
-                _rb.release(n);
-            }
-            _com->onreceive(&req);
-            return 1; //1 indicate: continuously receive in evloop
-        }else{ //CLIENT SIDE
-            RESPONSE rsp;
-            int n = rsp.decode(&_rb);
-            if(n<0){ //failed
-                fprintf(stderr, "Error: response decode failed\n");
-                return -1;
-            }else if(n==0){ //incomplete
-                return 0;
-            }else{ //ok
-                _rb.release(n);
-            }
-            _com->onreceive(&rsp);
-            return 1;
-        }
+        return _com->onreceive(&_rb);
     }
 
-    side_type_t _side;
     evloop_t *_ep;
     int _fd;
     comhandler_t *_com;
@@ -126,3 +95,4 @@ private:
     buff_t _rb;
     buff_t _wb;
 };
+

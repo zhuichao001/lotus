@@ -8,9 +8,11 @@ public:
     virtual int write() = 0;
 };
 
+class buff_t;
+
 //for upper layer
 class comhandler_t {
 public:
-    virtual int onreceive(void *) = 0;
+    virtual int onreceive(buff_t *) = 0;
     virtual int onclose() = 0;
 };

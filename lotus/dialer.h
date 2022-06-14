@@ -26,12 +26,12 @@ public:
             return -1;
         }
 
-        _conn = new endpoint_t<REQUEST, RESPONSE>(endpoint_t<REQUEST, RESPONSE>::CLIENT_SIDE, _ep, fd, this);
+        _conn = new endpoint_t<REQUEST, RESPONSE>(_ep, fd, this);
         _conn->open();
         return 0;
     }
 
-    int onclose(){
+    int onclose()override{
         for(auto it : _sessions){
             int msgid = it.first;
             session_t<REQUEST, RESPONSE> *session = it.second;
@@ -66,19 +66,27 @@ public:
         _sessions.erase(it);
     }
 
-    int onreceive(void *response){
-        RESPONSE *rsp = static_cast<RESPONSE*>(response);
-        const uint64_t msgid = rsp->msgid();
-        auto it = _sessions.find(msgid);
-        if(it == _sessions.end()){
+    int onreceive(buff_t *buf)override{
+        RESPONSE rsp;
+        int n = rsp.decode(buf);
+        if(n<0){ //failed
+            fprintf(stderr, "Error: response decode failed\n");
             return -1;
+        }else if(n==0){ //incomplete
+            return 0;
+        }else{ //ok
+            buf->release(n);
         }
-        session_t<REQUEST, RESPONSE> *session = it->second;
-        session->onreply(rsp);
 
-        delete session;
-        _sessions.erase(it);
-        return 0;
+        const uint64_t msgid = rsp.msgid();
+        auto it = _sessions.find(msgid);
+        if(it != _sessions.end()){
+            session_t<REQUEST, RESPONSE> *session = it->second;
+            session->onreply(&rsp);
+            delete session;
+            _sessions.erase(it);
+        }
+        return 1;
     }
 
     int call(REQUEST *req,  SessionCallback<REQUEST, RESPONSE> callback, uint64_t us=1000000 /*timeout: default 1 second*/){

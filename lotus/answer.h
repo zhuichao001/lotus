@@ -25,26 +25,35 @@ public:
     }
 
     int open(){
-        _conn = new endpoint_t<REQUEST, RESPONSE>(endpoint_t<REQUEST, RESPONSE>::SERVER_SIDE, _ep, _fd, this);
+        _conn = new endpoint_t<REQUEST, RESPONSE>(_ep, _fd, this);
         int err = _conn->open();
         fprintf(stderr, "fd:%d open iohandler\n", _conn->fd());
         return err;
     }
 
-    int onclose(){
+    int onclose()override{
         delete this;
         return 0;
     }
 
-    int onreceive(void *request){
-        REQUEST *req = static_cast<REQUEST*>(request);
-        fprintf(stderr, "receive msg to process\n");
+    int onreceive(buff_t *buf)override{
+        REQUEST req;
+        int n = req.decode(buf);
+        if(n<0){ //failed
+            fprintf(stderr, "Error: request decode failed\n");
+            return -1;
+        }else if(n==0){ //incomplete
+            return 0;
+        }else{ //ok
+            buf->release(n);
+        }
 
-        auto session = new session_t<REQUEST, RESPONSE>(_conn, req); 
+        fprintf(stderr, "receive msg to process\n");
+        auto session = new session_t<REQUEST, RESPONSE>(_conn, &req); 
         _processcb(session);
         delete session;
 
-        return 0;
+        return 1; //success
     }
 
 private:
