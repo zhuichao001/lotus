@@ -85,6 +85,8 @@ public:
             session->onreply(&rsp);
             delete session;
             _sessions.erase(it);
+        }else{
+            fprintf(stderr, "session-%d not found\n", msgid);
         }
         return 1;
     }

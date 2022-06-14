@@ -46,7 +46,7 @@ public:
 
     int read() override {
         bread(_fd, &_rb);
-        _ep->post(std::bind(&endpoint_t::receive, this));
+        _ep->post(std::bind(&comhandler_t::onreceive, _com, &_rb));
         return 0;
     }
 
