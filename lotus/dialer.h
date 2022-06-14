@@ -26,7 +26,7 @@ public:
             return -1;
         }
 
-        _conn = new endpoint_t<REQUEST, RESPONSE>(_ep, fd, this);
+        _conn = new endpoint_t(_ep, fd, this);
         _conn->open();
         return 0;
     }
@@ -134,7 +134,7 @@ private:
     evloop_t *_ep;
     const address_t *_addr;
     timedriver_t *_watcher;
-    endpoint_t<REQUEST, RESPONSE> *_conn;
+    endpoint_t *_conn;
     std::map<uint64_t, session_t<REQUEST, RESPONSE> *> _sessions;
 };
 

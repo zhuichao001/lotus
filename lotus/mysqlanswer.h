@@ -18,7 +18,7 @@ public:
     }
 
     int open(){
-        _conn = new endpoint_t<sql_request_t, sql_response_t>(_ep, _fd, this);
+        _conn = new endpoint_t(_ep, _fd, this);
         int err = _conn->open();
         fprintf(stderr, "fd:%d open iohandler\n", _conn->fd());
 
@@ -87,7 +87,7 @@ private:
     address_t _addr;
     timedriver_t *_watcher;
     ProcessCallback<sql_request_t, sql_response_t> _processcb;
-    endpoint_t<sql_request_t, sql_response_t> *_conn;
+    endpoint_t *_conn;
     std::map<uint64_t, session_t<sql_request_t, sql_response_t> *> _sessions;
     STAGE _stage; //1:HANDSHAKE, 3:COMMAND
 };

@@ -13,20 +13,18 @@ enum class session_state_t{
     REPLY_CONNCLOSE = 4,
 } ;
 
-template<typename REQUEST, typename RESPONSE>
 class endpoint_t;
 
 template<typename REQUEST, typename RESPONSE>
 class session_t{
 public:
     session_state_t _state;
-
-    endpoint_t<REQUEST, RESPONSE> *_conn;
+    endpoint_t *_conn;
     REQUEST *_req;
     SessionCallback<REQUEST, RESPONSE> _callback;
     uint64_t  _rpcat; //start time
 
-    session_t(endpoint_t<REQUEST, RESPONSE> *conn, REQUEST *req):
+    session_t(endpoint_t *conn, REQUEST *req):
         _conn(conn),
         _req(req){
         _callback = nullptr;

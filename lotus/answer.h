@@ -25,7 +25,7 @@ public:
     }
 
     int open(){
-        _conn = new endpoint_t<REQUEST, RESPONSE>(_ep, _fd, this);
+        _conn = new endpoint_t(_ep, _fd, this);
         int err = _conn->open();
         fprintf(stderr, "fd:%d open iohandler\n", _conn->fd());
         return err;
@@ -62,5 +62,5 @@ private:
     address_t _addr;
     timedriver_t *_watcher;
     ProcessCallback<REQUEST, RESPONSE> _processcb;
-    endpoint_t<REQUEST, RESPONSE> *_conn;
+    endpoint_t *_conn;
 };

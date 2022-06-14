@@ -9,9 +9,6 @@
 #include "socket.h"
 #include "handler.h"
 
-
-
-template<typename REQUEST, typename RESPONSE>
 class endpoint_t: 
     public iohandler_t {
 public:
