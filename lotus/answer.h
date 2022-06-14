@@ -21,10 +21,6 @@ public:
     }
 
     ~answer_t(){
-        for(auto it : _sessions){
-            int msgid = it.first;
-            delete _sessions[msgid];
-        }
         delete _conn;
     }
 
@@ -42,13 +38,12 @@ public:
 
     int onreceive(void *request){
         REQUEST *req = static_cast<REQUEST*>(request);
-        uint64_t msgid = req->msgid();
-        fprintf(stderr, "receive msg:%d to process\n", msgid);
-        _sessions[msgid] = new session_t<REQUEST, RESPONSE>(_conn, req); 
-        _processcb(_sessions[msgid]);
+        fprintf(stderr, "receive msg to process\n");
 
-        delete _sessions[msgid];
-        _sessions.erase(msgid);
+        auto session = new session_t<REQUEST, RESPONSE>(_conn, req); 
+        _processcb(session);
+        delete session;
+
         return 0;
     }
 
@@ -59,5 +54,4 @@ private:
     timedriver_t *_watcher;
     ProcessCallback<REQUEST, RESPONSE> _processcb;
     endpoint_t<REQUEST, RESPONSE> *_conn;
-    std::map<uint64_t, session_t<REQUEST, RESPONSE> *> _sessions;
 };

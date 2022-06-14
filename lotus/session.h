@@ -44,9 +44,7 @@ public:
             fprintf(stderr, "Failed reply, session state:REPLY_CONNCLOSE\n");
             return -1;
         }
-
-        rsp->setmsgid(_req->msgid());
-
+        //rsp->setmsgid(_req->msgid());
         buff_t buf(4096);
         rsp->encode(&buf);
 

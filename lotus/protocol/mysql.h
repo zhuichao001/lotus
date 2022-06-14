@@ -28,6 +28,7 @@ enum class SERVER_STATUS {
 
 //COMMAND TYPE
 enum class COMMAND_TYPE {
+    COM_UNKNOWN             = 0x01,
     COM_QUIT                = 0x01,
     COM_INIDB               = 0x02,
     COM_QUERY               = 0x03,
@@ -112,12 +113,9 @@ enum CAPABILITY_FLAG {
     CLIENT_MULTI_RESULTS = 131072,
 };
 
-int server_capabilities();
-
-enum mysql_reqtype_t {
-    REQ_HANDSHAKE   = 1,
-    REQ_AUTH        = 2,
-    REQ_COMMAND     = 3,
+enum class STAGE {
+    HANDSHAKE   = 1,
+    COMMAND     = 3,
 };
 
 enum mysql_rsptype_t {
@@ -133,6 +131,8 @@ typedef struct mysql_packet_t {
     void *payload;
 
     mysql_packet_t();
+    int encode(buff_t *to);
+    int decode(buff_t *from);
 } mysql_packet_t;
 
 typedef struct handshake_packet_t {
@@ -146,32 +146,32 @@ typedef struct handshake_packet_t {
     char *rest_of_scramble;
 
     handshake_packet_t();
-    void encode(buff_t *to);
-    void decode(buff_t *from);
+    int encode(buff_t *to);
+    int decode(buff_t *from);
 } handshake_packet_t;
 
 typedef struct auth_packet_t {
     uint32_t client_flags;
     uint32_t max_packet_size;
     uint8_t charset_index;
-    unsigned char *extra; //23 bytes
+    unsigned char extra[23]; //23 bytes
 
     char *usr;
-    unsigned char*passwd;
+    char passwd[128];
     char *database;
 
     auth_packet_t();
-    void encode(buff_t *to);
-    void decode(buff_t *from);
+    int encode(buff_t *to);
+    int decode(buff_t *from);
 } auth_packet_t;
 
 typedef struct command_packet_t {
-    uint8_t command;
+    COMMAND_TYPE command;
     uint8_t *args;
 
     command_packet_t();
-    void encode(buff_t *to);
-    void decode(buff_t *from);
+    int encode(buff_t *to);
+    int decode(buff_t *from);
 } command_packet_t;
 
 typedef struct eof_packet_t {
@@ -180,8 +180,8 @@ typedef struct eof_packet_t {
     unsigned char status;
 
     eof_packet_t();
-    void encode(buff_t *to);
-    void decode(buff_t *from);
+    int encode(buff_t *to);
+    int decode(buff_t *from);
 } eof_packet_t;
 
 typedef struct error_packet_t {
@@ -192,8 +192,8 @@ typedef struct error_packet_t {
     char *message;
 
     error_packet_t();
-    void encode(buff_t *to);
-    void decode(buff_t *from);
+    int encode(buff_t *to);
+    int decode(buff_t *from);
 } error_packet_t;
 
 typedef struct ok_packet_t {
@@ -205,8 +205,8 @@ typedef struct ok_packet_t {
     char *message;
 
     ok_packet_t();
-    void encode(buff_t *to);
-    void decode(buff_t *from);
+    int encode(buff_t *to);
+    int decode(buff_t *from);
 } ok_packet_t;
 
 typedef struct {
@@ -240,16 +240,11 @@ typedef struct {
 } result_set_t;
 
 class mysql_request_t {
-    mysql_packet_t pkt;
-    mysql_reqtype_t type;
+    command_packet_t cmd_pkt;
+
 public:
-    mysql_request_t(){
-    }
-
     int encode(buff_t *to);
-
     int decode(buff_t *from);
-
     void print(){
         buff_t buf(512);     
         this->encode(&buf);
@@ -261,16 +256,16 @@ class mysql_response_t {
     mysql_packet_t pkt;
     mysql_rsptype_t type;
 public:
-    mysql_response_t(){
-    }
-
     int encode(buff_t *to);
-
     int decode(buff_t *from);
-
     void print(){
         buff_t buf(512);     
         encode(&buf);
         fprintf(stderr, "print mysql_response_t------\n%s\n", buf.data());
     }
 };
+
+int server_capabilities();
+
+int read_lengthed_str(buff_t *from, char *dst);
+

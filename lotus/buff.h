@@ -100,26 +100,48 @@ public:
     }
 
     //litte endian
-    int write_le(uint64_t val, int bytes){
-        if(bytes>8){
+    int read_le(void *val, int bytes){
+        if(bytes>8 || len()<bytes){
             return -1;
         }
-        uint64_t leval=0;
-        unsigned char *p = (unsigned char *)&leval;
-        for(int i=0; i<bytes; ++i){
-            *p = val & 0xff;
-            val >>=8;
-        }
-        append((char*)&leval, bytes);
+        memcpy(val, data(), bytes);
+        release(bytes);
         return 0;
     }
 
     //big endian
-    int write_be(uint64_t val, int bytes){
+    int read_be(void *val, int bytes){
+        if(bytes>8 || len()<bytes){
+            return -1;
+        }
+        uint8_t *pval = (uint8_t*)val;
+        uint8_t *p = (unsigned char *)data()+bytes-1;
+        for(int i=0; i<bytes; ++i){
+            *(uint8_t*)val = *pval;
+            --p;
+            ++pval;
+        }
+        release(bytes);
+        return 0;
+    }
+
+    //litte endian
+    int write_le(const void *val, int bytes){
         if(bytes>8){
             return -1;
         }
-        append((char*)&val+(sizeof(uint64_t)-bytes), bytes);
+        append((const char*)val, bytes);
+        return 0;
+    }
+
+    //big endian
+    int write_be(const void *val, int bytes){
+        if(bytes>8){
+            return -1;
+        }
+        for(int i=0; i<bytes; ++i){
+            append((const char*)val+(bytes-1-i), 1);
+        }
         return 0;
     }
 
