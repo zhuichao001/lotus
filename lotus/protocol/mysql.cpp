@@ -38,7 +38,7 @@ handshake_packet_t::handshake_packet_t():
     thread_id(0), //TODO
     capabilities(server_capabilities()),
     charset_index(CHASET_INDEX_UTF8),
-    server_status(2) {
+    server_status(uint16_t(SERVER_STATUS::AUTOCOMMIT)) {
     seed = random_seed(SCRAMBLE_PASSWORD_LEN);
     rest_of_scramble = seed+8;
 }
@@ -55,7 +55,13 @@ eof_packet_t::eof_packet_t(){
 error_packet_t::error_packet_t(){
 }
 
-ok_packet_t::ok_packet_t(){
+ok_packet_t::ok_packet_t():
+    field_count(0),
+    affected_rows(0),
+    inserted_id(0),
+    server_status(),
+    warning_count(uint16_t(SERVER_STATUS::AUTOCOMMIT)),
+    message(nullptr){
 }
 
 /////////////////////////////////////////////////

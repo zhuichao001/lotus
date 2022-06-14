@@ -15,20 +15,33 @@
 #define ERROR_PACKET_FIELD_COUNT 0xff
 #define EOF_PACKET_FIELD_COUNT 0xfe
 
+//SERVER STATUS
+enum class SERVER_STATUS {
+    IN_TRANS            = 0x0001,
+    AUTOCOMMIT          = 0x0002,
+    CURSOR_EXISTS       = 0x0040,
+    LAST_ROW_SENT       = 0x0080,
+    DB_DROPPED          = 0x0100,
+    NO_BACKSLASH_ESCAPES= 0x0200,
+    METADATA_CHANGED    = 0x0400,
+};
+
 //COMMAND TYPE
-#define COM_QUIT        0x01
-#define COM_INIDB       0x02
-#define COM_QUERY       0x03
-#define COM_FIELD_LIST  0x04
-#define COM_CREATE_DB   0x05
-#define COM_DROP_DB     0x06
-#define COM_STMT_PREPARE        0x16
-#define COM_STMT_EXECUTE        0x17
-#define COM_STMT_SEND_LONG_DATA 0x18
-#define COM_STMT_CLOSE          0x19
-#define COM_STMT_RESET          0x1A
-#define COM_SET_OPTION          0x1B
-#define COM_STMT_FETCH          0x1C
+enum class COMMAND_TYPE {
+    COM_QUIT                = 0x01,
+    COM_INIDB               = 0x02,
+    COM_QUERY               = 0x03,
+    COM_FIELD_LIST          = 0x04,
+    COM_CREATE_DB           = 0x05,
+    COM_DROP_DB             = 0x06,
+    COM_STMT_PREPARE        = 0x16,
+    COM_STMT_EXECUTE        = 0x17,
+    COM_STMT_SEND_LONG_DATA = 0x18,
+    COM_STMT_CLOSE          = 0x19,
+    COM_STMT_RESET          = 0x1A,
+    COM_SET_OPTION          = 0x1B,
+    COM_STMT_FETCH          = 0x1C,
+};
 
 enum class FILELD_TYPE{
     DECIMAL = 0,
@@ -184,12 +197,12 @@ typedef struct error_packet_t {
 } error_packet_t;
 
 typedef struct ok_packet_t {
-    unsigned char field_count;
-    long affected_rows;
-    long inserted_id;
+    uint8_t field_count;
+    uint64_t affected_rows; //atmost 8 bytes
+    uint64_t inserted_id; //atmost 8 bytes
     uint16_t server_status;
     uint16_t warning_count;
-    unsigned char *message;
+    char *message;
 
     ok_packet_t();
     void encode(buff_t *to);
