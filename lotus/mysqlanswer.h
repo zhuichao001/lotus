@@ -67,5 +67,4 @@ private:
     ProcessCallback<sql_request_t, sql_response_t> _processcb;
     endpoint_t<sql_request_t, sql_response_t> *_conn;
     std::map<uint64_t, session_t<sql_request_t, sql_response_t> *> _sessions;
-
 };

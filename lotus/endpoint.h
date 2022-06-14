@@ -9,11 +9,6 @@
 #include "socket.h"
 #include "handler.h"
 
-//enum class side_type_t{
-//    CLIENT_SIDE = 1,
-//    SERVER_SIDE = 2,
-//};
-
 template<typename REQUEST, typename RESPONSE>
 class endpoint_t: 
     public iohandler_t {
