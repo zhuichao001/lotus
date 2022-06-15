@@ -228,8 +228,8 @@ typedef struct {
 } _result_set_header_t;
 
 struct LIST_HEAD{
-        struct LIST_HEAD *prev;
-        struct LIST_HEAD *next;
+    struct LIST_HEAD *prev;
+    struct LIST_HEAD *next;
 };
 
 typedef struct {

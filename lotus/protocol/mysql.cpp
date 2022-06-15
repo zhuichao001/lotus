@@ -20,20 +20,21 @@ int server_capabilities(){
 
 uint64_t read_lenenc_int(buff_t *from){
     char *src = from->data();
-    uint64_t len = *(uint8_t*)src;
+    uint8_t flag = *(uint8_t*)src;
     int bytes = 0;
-    if(len<0xFC){
+    if(flag<0xFC){
         bytes = 0;
-    }else if(len==0xFC){
+    }else if(flag==0xFC){
         bytes = 2;
-    }else if(len==0xFD){
+    }else if(flag==0xFD){
         bytes = 4;
-    }else if(len==0xFE){
+    }else if(flag==0xFE){
         bytes = 8;
     }
 
-    if(bytes!=0){
-        len = 0;
+    uint64_t len = 0;
+    if(flag<0xFC){
+        len = flag;
     }
     for(int i=0; i<bytes; ++i){
         len = len + (*(uint8_t*)(src+1))<<(i*8);
@@ -51,17 +52,34 @@ int read_lenenc_str(buff_t *from, char *dst){
 }
 
 int write_lenenc_int(buff_t *to, uint64_t val){
-    //TODO: FIXME
+    int flag = 0;
+    int bytes = 0;
+    if(val<251){
+        flag = val;
+        bytes = 0;
+    }else if(val<(2<<16)){
+        flag = 0xFC;
+        bytes = 2;
+    }else if(val<(2<<24)){
+        flag = 0xFD;
+        bytes = 4;
+    }else{ //less than 2<<64
+        flag = 0xFE;
+        bytes = 8;
+    }
+    to->write_le(&flag, 1);
+    to->write_le(&val, bytes);
     return 0;
 }
 
-int write_lenenc_str(buff_t *to, char *str){
-    //TODO: FIXME
+int write_lenenc_str(buff_t *to, const char *str, const int len){
+    write_lenenc_int(to, len);
+    to->append(str, len);
     return 0;
 }
 
 char *random_seed(int size){
-    char* seed = (char*)malloc(size);
+    char *seed = (char*)malloc(size);
     for(int i=0 ;i < size ;i++){
         //seed[i] = rand() % 256;
         seed[i] = 0xff;
@@ -129,7 +147,7 @@ ok_packet_t::ok_packet_t():
     message(nullptr){
 }
 
-/////////////////////////////////////////////////
+/////////////////////////////////////////////////////////
 int handshake_packet_t::encode(buff_t *to){
     to->write_le(&protocol_version, 1);
     to->append(server_version, strlen(server_version)+1);
@@ -163,6 +181,7 @@ int auth_packet_t::decode(buff_t *from){
     if(from->len()<32){
         return -1;
     }
+
     from->read_le(&client_flags, 4);
     from->read_le(&max_packet_size, 4);
     from->read_le(&charset_index, 1);
@@ -172,7 +191,6 @@ int auth_packet_t::decode(buff_t *from){
     from->release(strlen(usr));
 
     int passwd_len = read_lenenc_str(from, passwd);
-
     database = from->data();
     from->release(strlen(database));
 
@@ -195,6 +213,7 @@ int eof_packet_t::encode(buff_t *to){
 }
 
 int eof_packet_t::decode(buff_t *from){
+    //TODO:
     return 0;
 }
 
@@ -214,7 +233,7 @@ int ok_packet_t::encode(buff_t *to){
     write_lenenc_int(to, inserted_id);
     to->write_le(&server_status, 2);
     to->write_le(&warning_count, 2);
-    write_lenenc_str(to, message);
+    write_lenenc_str(to, message, strlen(message));
     return 0;
 }
 
@@ -224,12 +243,12 @@ int ok_packet_t::decode(buff_t *from){
 }
 
 int mysql_request_t::encode(buff_t *to){
+    //TODO:
     return 0;
 }
 
 int mysql_request_t::decode(buff_t *from){
     cmd_pkt.decode(from);
-
     switch(cmd_pkt.command){
         //TODO: case
         default:
@@ -239,10 +258,11 @@ int mysql_request_t::decode(buff_t *from){
 }
 
 int mysql_response_t::encode(buff_t *to){
+    //TODO:
     return 0;
 }
 
 int mysql_response_t::decode(buff_t *from){
+    //TODO:
     return 0;
 }
-
