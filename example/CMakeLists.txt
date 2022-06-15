@@ -27,3 +27,6 @@ target_link_libraries(rpc_client lotus pthread)
 
 add_executable(http_server ./http_server.cpp)
 target_link_libraries(http_server lotus pthread)
+
+add_executable(mysql_server ./mysql_server.cpp)
+target_link_libraries(mysql_server lotus pthread)

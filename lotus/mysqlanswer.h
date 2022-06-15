@@ -2,10 +2,10 @@
 #include "protocol/mysql.h"
 
 template<>
-class answer_t<sql_request_t, sql_response_t>:
+class answer_t<mysql_request_t, mysql_response_t>:
     public comhandler_t {
 public:
-    answer_t(evloop_t *ep, int fd, ProcessCallback<sql_request_t, sql_response_t> procb):
+    answer_t(evloop_t *ep, int fd, ProcessCallback<mysql_request_t, mysql_response_t> procb):
         _ep(ep),
         _fd(fd),
         _stage(STAGE::HANDSHAKE),
@@ -32,7 +32,7 @@ public:
     }
 
     int onreceive(buff_t *buf)override{
-        if(_conn->stage() == STAGE::HANDSHAKE){
+        if(_stage == STAGE::HANDSHAKE){
             auth_packet_t pkt;
             int n = pkt.decode(buf);
             if(n<0){ //failed
@@ -59,7 +59,7 @@ public:
             }
 
             fprintf(stderr, "receive mysql request to process\n");
-            auto session = new session_t<sql_request_t, sql_response_t>(_conn, req); 
+            auto session = new session_t<mysql_request_t, mysql_response_t>(_conn, &req); 
             _processcb(session);
             delete session;
             return 1; //1 indicate: continuously receive in evloop
@@ -71,14 +71,14 @@ private:
         handshake_packet_t p;
         buff_t buf;
         p.encode(&buf);
-        _conn->send(buf);
+        _conn->send(&buf);
     }
 
     void send_ok(){
         ok_packet_t p;
         buff_t buf;
         p.encode(&buf);
-        _conn->send(buf);
+        _conn->send(&buf);
     }
 
 private:
@@ -86,8 +86,8 @@ private:
     const int _fd;
     address_t _addr;
     timedriver_t *_watcher;
-    ProcessCallback<sql_request_t, sql_response_t> _processcb;
+    ProcessCallback<mysql_request_t, mysql_response_t> _processcb;
     endpoint_t *_conn;
-    std::map<uint64_t, session_t<sql_request_t, sql_response_t> *> _sessions;
+    std::map<uint64_t, session_t<mysql_request_t, mysql_response_t> *> _sessions;
     STAGE _stage; //1:HANDSHAKE, 3:COMMAND
 };

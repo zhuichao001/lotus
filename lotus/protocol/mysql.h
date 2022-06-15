@@ -197,6 +197,7 @@ typedef struct error_packet_t {
 } error_packet_t;
 
 typedef struct ok_packet_t {
+    uint8_t ok_flag;
     uint8_t field_count;
     uint64_t affected_rows; //atmost 8 bytes
     uint64_t inserted_id; //atmost 8 bytes

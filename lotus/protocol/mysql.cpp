@@ -18,13 +18,12 @@ int server_capabilities(){
     return flag;
 }
 
-int read_lengthed_str(buff_t *from, char *dst){
+uint64_t read_lenenc_int(buff_t *from){
     char *src = from->data();
-    int len = *(uint8_t*)src;
+    uint64_t len = *(uint8_t*)src;
     int bytes = 0;
     if(len<0xFC){
-        memcpy(dst, src+1, len);
-        return 1;
+        bytes = 0;
     }else if(len==0xFC){
         bytes = 2;
     }else if(len==0xFD){
@@ -33,18 +32,38 @@ int read_lengthed_str(buff_t *from, char *dst){
         bytes = 8;
     }
 
-    len = 0;
+    if(bytes!=0){
+        len = 0;
+    }
     for(int i=0; i<bytes; ++i){
         len = len + (*(uint8_t*)(src+1))<<(i*8);
     }
-    memcpy(dst, src+1+bytes, len);
-    return bytes+1;
+    from->release(bytes+1);
+    return len;
+}
+
+int read_lenenc_str(buff_t *from, char *dst){
+    int len = int(read_lenenc_int(from));
+    char *src=from->data();
+    memcpy(dst, src, len);
+    from->release(len);
+    return len;
+}
+
+int write_lenenc_int(buff_t *to, uint64_t val){
+    //TODO: FIXME
+    return 0;
+}
+
+int write_lenenc_str(buff_t *to, char *str){
+    //TODO: FIXME
+    return 0;
 }
 
 char *random_seed(int size){
     char* seed = (char*)malloc(size);
     for(int i=0 ;i < size ;i++){
-        //seed[i] = rand()%256;
+        //seed[i] = rand() % 256;
         seed[i] = 0xff;
     }
     return seed;
@@ -101,6 +120,7 @@ error_packet_t::error_packet_t(){
 }
 
 ok_packet_t::ok_packet_t():
+    ok_flag(0x00),
     field_count(0),
     affected_rows(0),
     inserted_id(0),
@@ -151,7 +171,7 @@ int auth_packet_t::decode(buff_t *from){
     usr = from->data();
     from->release(strlen(usr));
 
-    int passwd_len = read_lengthed_str(from, passwd);
+    int passwd_len = read_lenenc_str(from, passwd);
 
     database = from->data();
     from->release(strlen(database));
@@ -174,12 +194,31 @@ int eof_packet_t::encode(buff_t *to){
     return 0;
 }
 
+int eof_packet_t::decode(buff_t *from){
+    return 0;
+}
+
+int error_packet_t::encode(buff_t *to){
+    //TODO:
+    return 0;
+}
+
 int error_packet_t::decode(buff_t *from){
     //TODO:
     return 0;
 }
 
-int error_packet_t::encode(buff_t *to){
+int ok_packet_t::encode(buff_t *to){
+    to->write_le(&ok_flag, 1);
+    write_lenenc_int(to, affected_rows);
+    write_lenenc_int(to, inserted_id);
+    to->write_le(&server_status, 2);
+    to->write_le(&warning_count, 2);
+    write_lenenc_str(to, message);
+    return 0;
+}
+
+int ok_packet_t::decode(buff_t *from){
     //TODO:
     return 0;
 }

@@ -7,7 +7,7 @@
 
 class buff_t {
 public:
-    buff_t(int cap):
+    buff_t(int cap=2048):
         _capacity(cap), 
         _start(0), 
         _end(0){
