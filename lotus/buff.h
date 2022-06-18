@@ -74,7 +74,7 @@ public:
         _buff = (char*)realloc(_buff, _capacity);
     }
 
-    int append(const char *slice, int size){
+    int append(const void *slice, int size){
         if(slice==nullptr || size<=0){
             return -1;
         }

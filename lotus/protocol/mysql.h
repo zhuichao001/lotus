@@ -5,9 +5,10 @@
 #include <assert.h>
 #include <string>
 #include "../buff.h"
+#include "mysql_error.h"
 
 #define PROTOCOL_VERSION 0x0A
-#define SERVER_VERSION "5.1.1"
+#define SERVER_VERSION "5.7.5"
 #define CHASET_INDEX_UTF8 83
 #define SCRAMBLE_PASSWORD_LEN 20
 
@@ -28,7 +29,7 @@ enum class SERVER_STATUS {
 
 //COMMAND TYPE
 enum class COMMAND_TYPE {
-    COM_UNKNOWN             = 0x01,
+    COM_UNKNOWN             = 0x00,
     COM_QUIT                = 0x01,
     COM_INIDB               = 0x02,
     COM_QUERY               = 0x03,
@@ -44,6 +45,7 @@ enum class COMMAND_TYPE {
     COM_STMT_FETCH          = 0x1C,
 };
 
+//FIELD TYPE
 enum class FILELD_TYPE{
     DECIMAL     = 0,
     TINY        = 1,
@@ -140,7 +142,7 @@ typedef struct handshake_packet_t {
     const char *server_version;
     uint32_t thread_id;
     char *seed;
-    int capabilities;
+    uint32_t capabilities;
     uint8_t charset_index;
     uint16_t server_status;
     char *rest_of_scramble;
@@ -174,19 +176,21 @@ typedef struct command_packet_t {
     int decode(buff_t *from);
 } command_packet_t;
 
-typedef struct eof_packet_t {
-    unsigned char field_count;
-    unsigned char warning_count;
-    unsigned char status;
+typedef struct ok_packet_t {
+    uint8_t field_count;
+    uint64_t affected_rows; //atmost 8 bytes
+    uint64_t inserted_id; //atmost 8 bytes
+    uint16_t warning_count;
+    uint16_t server_status;
+    char *message;
 
-    eof_packet_t();
+    ok_packet_t();
     int encode(buff_t *to);
     int decode(buff_t *from);
-} eof_packet_t;
+} ok_packet_t;
 
 typedef struct error_packet_t {
-    unsigned char field_count;
-    int error;
+    uint16_t error;
     unsigned char mark;
     char *sql_state;
     char *message;
@@ -196,19 +200,14 @@ typedef struct error_packet_t {
     int decode(buff_t *from);
 } error_packet_t;
 
-typedef struct ok_packet_t {
-    uint8_t ok_flag;
-    uint8_t field_count;
-    uint64_t affected_rows; //atmost 8 bytes
-    uint64_t inserted_id; //atmost 8 bytes
-    uint16_t server_status;
+typedef struct eof_packet_t {
     uint16_t warning_count;
-    char *message;
+    uint16_t server_status;
 
-    ok_packet_t();
+    eof_packet_t();
     int encode(buff_t *to);
     int decode(buff_t *from);
-} ok_packet_t;
+} eof_packet_t;
 
 typedef struct {
     unsigned char* value;

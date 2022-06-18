@@ -79,11 +79,11 @@ int write_lenenc_str(buff_t *to, const char *str, const int len){
 }
 
 char *random_seed(int size){
-    char *seed = (char*)malloc(size);
+    char *seed = (char*)malloc(size+1);
     for(int i=0 ;i < size ;i++){
-        //seed[i] = rand() % 256;
         seed[i] = 0xff;
     }
+    seed[size] = 0x00;
     return seed;
 }
 
@@ -115,7 +115,7 @@ int mysql_packet_t::decode(buff_t *from){
 handshake_packet_t::handshake_packet_t():
     protocol_version(PROTOCOL_VERSION),
     server_version(SERVER_VERSION),
-    thread_id(0), //TODO
+    thread_id(0), //TODO: increment
     capabilities(server_capabilities()),
     charset_index(CHASET_INDEX_UTF8),
     server_status(uint16_t(SERVER_STATUS::AUTOCOMMIT)) {
@@ -131,19 +131,24 @@ command_packet_t::command_packet_t():
     args(nullptr){
 }
 
-eof_packet_t::eof_packet_t(){
+eof_packet_t::eof_packet_t():
+    warning_count(0),
+    server_status(uint16_t(SERVER_STATUS::AUTOCOMMIT)){
 }
 
-error_packet_t::error_packet_t(){
+error_packet_t::error_packet_t():
+    error(0),
+    mark('#'),
+    sql_state((char*)"HY000"),
+    message((char*)""){
 }
 
 ok_packet_t::ok_packet_t():
-    ok_flag(0x00),
     field_count(0),
     affected_rows(0),
     inserted_id(0),
-    server_status(),
-    warning_count(uint16_t(SERVER_STATUS::AUTOCOMMIT)),
+    warning_count(0),
+    server_status(uint16_t(SERVER_STATUS::AUTOCOMMIT)),
     message(nullptr){
 }
 
@@ -153,15 +158,23 @@ int handshake_packet_t::encode(buff_t *to){
     to->append(server_version, strlen(server_version)+1);
     to->write_le(&thread_id, 4);
     to->append(seed, 8);
-    to->append(0, 1);
-    to->write_le(&capabilities, 2);
+    uint8_t filter = 0x00;
+    to->append(&filter, 1);
+    uint16_t capability_flags_1 = capabilities & 0xffff;
+    to->write_le(&capability_flags_1, 2); //the lower 2 bytes
     to->write_le(&charset_index, 1);
     to->write_le(&server_status, 2);
-    char padding[13];
+    uint16_t capability_flags_2 = (capabilities >>16) & 0xffff;
+    to->write_le(&capability_flags_2, 2); //the upper 2 bytes
+    uint8_t auth_plugin_data_len = 0;
+    to->write_le(&auth_plugin_data_len, 1);
+    char padding[10];
     memset(padding, 0, sizeof(padding));
-    to->append(padding, 13);
+    to->append(padding, 10);
     to->append(rest_of_scramble, 13);
-    return 45 + (strlen(server_version)+1);
+    const char *auth_plugin_name ="";
+    to->append(auth_plugin_name, 1);
+    return to->len();
 }
 
 int handshake_packet_t::decode(buff_t *from){
@@ -198,7 +211,7 @@ int auth_packet_t::decode(buff_t *from){
 }
 
 int command_packet_t::encode(buff_t *to){
-    //TODO:
+    //TODO
     return 0;
 }
 
@@ -207,28 +220,9 @@ int command_packet_t::decode(buff_t *from){
     return 0;
 }
 
-int eof_packet_t::encode(buff_t *to){
-    //TODO:
-    return 0;
-}
-
-int eof_packet_t::decode(buff_t *from){
-    //TODO:
-    return 0;
-}
-
-int error_packet_t::encode(buff_t *to){
-    //TODO:
-    return 0;
-}
-
-int error_packet_t::decode(buff_t *from){
-    //TODO:
-    return 0;
-}
-
 int ok_packet_t::encode(buff_t *to){
-    to->write_le(&ok_flag, 1);
+    uint8_t flag = 0x00; //header for ok packet
+    to->write_le(&flag, 1);
     write_lenenc_int(to, affected_rows);
     write_lenenc_int(to, inserted_id);
     to->write_le(&server_status, 2);
@@ -238,12 +232,41 @@ int ok_packet_t::encode(buff_t *to){
 }
 
 int ok_packet_t::decode(buff_t *from){
+    //TODO
+    return 0;
+}
+
+int error_packet_t::encode(buff_t *to){
+    uint8_t flag = 0xFF; //header for error packet
+    to->write_le(&flag, 1);
+    to->write_le(&error, 2);
+    to->write_le(&mark, 1);
+    to->append(sql_state, strlen(sql_state));
+    to->append(message, strlen(message));
+    return to->len();
+}
+
+int error_packet_t::decode(buff_t *from){
     //TODO:
     return 0;
 }
 
+int eof_packet_t::encode(buff_t *to){
+    uint8_t flag = 0xFE;
+    to->write_le(&flag, 1);
+    //if capabilities & CLIENT_PROTOCOL_41:
+    to->write_le(&warning_count, 2);
+    to->write_le(&server_status, 2);
+    return to->len();
+}
+
+int eof_packet_t::decode(buff_t *from){
+    //TODO
+    return 0;
+}
+
 int mysql_request_t::encode(buff_t *to){
-    //TODO:
+    //TODO
     return 0;
 }
 
