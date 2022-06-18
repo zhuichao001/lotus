@@ -169,7 +169,7 @@ typedef struct auth_packet_t {
 
 typedef struct command_packet_t {
     COMMAND_TYPE command;
-    uint8_t *args;
+    char query[1024];
 
     command_packet_t();
     int encode(buff_t *to);
@@ -240,7 +240,8 @@ typedef struct {
 } result_set_t;
 
 class mysql_request_t {
-    command_packet_t cmd_pkt;
+    mysql_packet_t header;
+    command_packet_t cmd;
 
 public:
     int encode(buff_t *to);
@@ -253,7 +254,7 @@ public:
 };
 
 class mysql_response_t {
-    mysql_packet_t pkt;
+    mysql_packet_t header;
     mysql_rsptype_t type;
 public:
     int encode(buff_t *to);

@@ -99,6 +99,16 @@ public:
         return 0;
     }
 
+    int read_str(char *cstr, int bytes){
+        int ret = read_le(cstr, bytes);
+        cstr[bytes] = '\0';
+        return ret;
+    }
+
+    int write_str(char *cstr, int bytes){
+        return append(cstr, bytes);
+    }
+
     //litte endian
     int read_le(void *val, int bytes){
         if(bytes>8 || len()<bytes){

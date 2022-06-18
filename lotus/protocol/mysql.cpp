@@ -118,7 +118,7 @@ handshake_packet_t::handshake_packet_t():
     thread_id(0), //TODO: increment
     capabilities(server_capabilities()),
     charset_index(CHASET_INDEX_UTF8),
-    server_status(uint16_t(SERVER_STATUS::AUTOCOMMIT)) {
+    server_status(uint16_t(SERVER_STATUS::AUTOCOMMIT)){
     seed = random_seed(SCRAMBLE_PASSWORD_LEN);
     rest_of_scramble = seed+8;
 }
@@ -127,8 +127,7 @@ auth_packet_t::auth_packet_t(){
 }
 
 command_packet_t::command_packet_t():
-    command(COMMAND_TYPE::COM_UNKNOWN),
-    args(nullptr){
+    command(COMMAND_TYPE::COM_UNKNOWN){
 }
 
 eof_packet_t::eof_packet_t():
@@ -271,11 +270,17 @@ int mysql_request_t::encode(buff_t *to){
 }
 
 int mysql_request_t::decode(buff_t *from){
-    cmd_pkt.decode(from);
-    switch(cmd_pkt.command){
-        //TODO: case
+    header.decode(from);
+    cmd.decode(from);
+    switch(cmd.command){
+        case COMMAND_TYPE::COM_INIDB:
+            from->read_str(cmd.query, from->len());
+            fprintf(stderr, "cmd_type: COM_INIDB, dbname:%s\n", cmd.query);
+        case COMMAND_TYPE::COM_CREATE_DB:
+            from->read_str(cmd.query, from->len());
+            fprintf(stderr, "cmd_type: COM_CREATE_DB, dbname:%s\n", cmd.query);
         default:
-            fprintf(stderr, "cmd_type:%d\n", cmd_pkt.command);
+            fprintf(stderr, "cmd_type: UNKNOWN\n");
     }
     return 0;
 }
