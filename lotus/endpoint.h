@@ -81,10 +81,6 @@ public:
     }
 
 private:
-    int receive(){
-        return _com->onreceive(&_rb);
-    }
-
     evloop_t *_ep;
     int _fd;
     comhandler_t *_com;
