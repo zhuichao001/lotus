@@ -32,8 +32,10 @@ public:
     }
 
     int onreceive(buff_t *buf)override{
+        fprintf(stderr, "onreceive:\n");
+        buf->print();
         if(_stage == STAGE::HANDSHAKE){
-            auth_packet_t pkt;
+            handshake_response_t pkt;
             int n = pkt.decode(buf);
             if(n<0){ //failed
                 fprintf(stderr, "Error: request decode failed\n");
@@ -68,9 +70,11 @@ public:
 
 private:
     void send_handshake(){
-        handshake_packet_t p;
+        handshake_request_t p;
         buff_t buf;
         p.encode(&buf);
+        fprintf(stderr, "send handshake request:\n");
+        buf.print();
         _conn->send(&buf);
     }
 

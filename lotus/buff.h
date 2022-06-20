@@ -155,6 +155,13 @@ public:
         return 0;
     }
 
+    void print(){
+        for(int i=0; i<len(); ++i){
+            fprintf(stderr, "%02x ", _buff[i]);
+        }
+        fprintf(stderr, "\n");
+    }
+
 private:
     char *_buff;
     int _capacity;

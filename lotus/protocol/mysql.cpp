@@ -14,6 +14,7 @@ int server_capabilities(){
     flag |= CLIENT_INTERACTIVE;
     flag |= CLIENT_IGNORE_SIGPIPE;
     flag |= CLIENT_TRANSACTIONS;
+    //flag |= CLIENT_PLUGIN_AUTH;
     return flag;
 }
 
@@ -111,7 +112,7 @@ int mysql_packet_t::decode(buff_t *from){
     return packet_len;
 }
 
-handshake_packet_t::handshake_packet_t():
+handshake_request_t::handshake_request_t():
     protocol_version(PROTOCOL_VERSION),
     server_version(SERVER_VERSION),
     thread_id(0), //TODO: increment
@@ -122,7 +123,7 @@ handshake_packet_t::handshake_packet_t():
     rest_of_scramble = seed+8;
 }
 
-auth_packet_t::auth_packet_t(){
+handshake_response_t::handshake_response_t(){
 }
 
 command_packet_t::command_packet_t():
@@ -151,7 +152,7 @@ ok_packet_t::ok_packet_t():
 }
 
 /////////////////////////////////////////////////////////
-int handshake_packet_t::encode(buff_t *to){ //for protocol version 10
+int handshake_request_t::encode(buff_t *to){ //for protocol version 10
     to->write_le(&protocol_version, 1);
     to->append(server_version, strlen(server_version)+1);
     to->write_le(&thread_id, 4); //a.k.a. connection id
@@ -164,23 +165,25 @@ int handshake_packet_t::encode(buff_t *to){ //for protocol version 10
     to->write_le(&server_status, 2);
     uint16_t capability_flags_2 = (capabilities>>16) & 0xffff;
     to->write_le(&capability_flags_2, 2); //the upper 2 bytes
-    uint8_t auth_plugin_data_len = 0;
-    to->write_le(&auth_plugin_data_len, 1);
-    char padding[10];
-    memset(padding, 0, sizeof(padding));
-    to->append(padding, 10);
+    if(capabilities & CLIENT_PLUGIN_AUTH){
+        uint8_t auth_plugin_data_len = 20;
+        to->write_le(&auth_plugin_data_len, 1);
+    }
+    char reserved[10];
+    memset(reserved, 0, sizeof(reserved));
+    to->append(reserved, 10);
     to->append(rest_of_scramble, 13);
     const char *auth_plugin_name ="";
     to->append(auth_plugin_name, 1);
     return to->len();
 }
 
-int handshake_packet_t::decode(buff_t *from){
+int handshake_request_t::decode(buff_t *from){
     //TODO:
     return 0;
 }
 
-int auth_packet_t::encode(buff_t *to){
+int handshake_response_t::encode(buff_t *to){
     memset(extra, 0, sizeof(extra));
     memset(usr, 0, sizeof(usr));
     memset(passwd, 0, sizeof(passwd));
@@ -188,7 +191,7 @@ int auth_packet_t::encode(buff_t *to){
     return 0;
 }
 
-int auth_packet_t::decode(buff_t *from){
+int handshake_response_t::decode(buff_t *from){
     if(from->len()<32){
         return -1;
     }

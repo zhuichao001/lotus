@@ -133,7 +133,7 @@ typedef struct mysql_packet_t {
     int decode(buff_t *from);
 } mysql_packet_t;
 
-typedef struct handshake_packet_t {
+typedef struct handshake_request_t {
     const uint8_t protocol_version;
     const char *server_version;
     uint32_t thread_id;
@@ -143,12 +143,12 @@ typedef struct handshake_packet_t {
     uint16_t server_status;
     char *rest_of_scramble;
 
-    handshake_packet_t();
+    handshake_request_t();
     int encode(buff_t *to);
     int decode(buff_t *from);
-} handshake_packet_t;
+} handshake_request_t;
 
-typedef struct auth_packet_t {
+typedef struct handshake_response_t {
     uint32_t client_flags;
     uint32_t max_packet_size;
     uint8_t charset_index;
@@ -158,10 +158,10 @@ typedef struct auth_packet_t {
     char passwd[128];
     char *database;
 
-    auth_packet_t();
+    handshake_response_t();
     int encode(buff_t *to);
     int decode(buff_t *from);
-} auth_packet_t;
+} handshake_response_t;
 
 typedef struct command_packet_t {
     COMMAND_TYPE command;
