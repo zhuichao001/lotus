@@ -7,14 +7,14 @@
 #include "../buff.h"
 #include "mysql_error.h"
 
-#define PROTOCOL_VERSION 0x0A
-#define SERVER_VERSION "5.7.5"
-#define CHASET_INDEX_UTF8 83
-#define SCRAMBLE_PASSWORD_LEN 20
+#define PROTOCOL_VERSION        0x0A
+#define SERVER_VERSION          "5.7.5"
+#define CHASET_INDEX_UTF8       83
+#define SCRAMBLE_PASSWORD_LEN   20
 
-#define OK_PACKET_FIELD_COUNT 0x00
+#define OK_PACKET_FIELD_COUNT   0x00
 #define ERROR_PACKET_FIELD_COUNT 0xff
-#define EOF_PACKET_FIELD_COUNT 0xfe
+#define EOF_PACKET_FIELD_COUNT  0xfe
 
 //SERVER STATUS
 enum class SERVER_STATUS {
@@ -77,42 +77,38 @@ enum class FILELD_TYPE{
 };
 
 enum CAPABILITY_FLAG {
-    // new more secure passwords
-    CLIENT_LONG_PASSWORD = 1,
-    // Found instead of affected rows
-    CLIENT_FOUND_ROWS = 2,
-    // Get all column flags
-    CLIENT_LONG_FLAG = 4,
-    // One can specify db on connect
-    CLIENT_CONNECT_WITH_DB = 8,
-    // Don't allow database.table.column
-    CLIENT_NO_SCHEMA = 16,
-    // Can use compression protocol
-    CLIENT_COMPRESS = 32,
-    // Odbc client
-    CLIENT_ODBC = 64,
-    // Can use LOAD DATA LOCAL
-    CLIENT_LOCAL_FILES = 128,
-    // Ignore spaces before '('
-    CLIENT_IGNORE_SPACE = 256,
-    // New 4.1 protocol This is an interactive client
-    CLIENT_PROTOCOL_41 = 512,
-    // This is an interactive client
-    CLIENT_INTERACTIVE = 1024,
-    // Switch to SSL after handshake
-    CLIENT_SSL = 2048,
-    // IGNORE sigpipes
-    CLIENT_IGNORE_SIGPIPE = 4096,
-    // Client knows about transactions
-    CLIENT_TRANSACTIONS = 8192,
-    // Old flag for 4.1 protocol
-    CLIENT_RESERVED = 16384,
-    // New 4.1 authentication
-    CLIENT_SECURE_CONNECTION = 32768,
-    // Enable/disable multi-stmt support
-    CLIENT_MULTI_STATEMENTS = 65536,
-    // Enable/disable multi-results
-    CLIENT_MULTI_RESULTS = 131072,
+    CLIENT_LONG_PASSWORD        = 1,
+    CLIENT_FOUND_ROWS           = 2,
+    CLIENT_LONG_FLAG            = 4,
+    CLIENT_CONNECT_WITH_DB      = 8,
+    CLIENT_NO_SCHEMA            = 16,
+    CLIENT_COMPRESS             = 32,
+    CLIENT_ODBC                 = 64,
+    CLIENT_LOCAL_FILES          = 128,
+    CLIENT_IGNORE_SPACE         = 256,
+    CLIENT_PROTOCOL_41          = 512,
+    CLIENT_INTERACTIVE          = 1024,
+    CLIENT_SSL                  = 2048,
+    CLIENT_IGNORE_SIGPIPE       = 4096,
+    CLIENT_TRANSACTIONS         = 8192,
+    CLIENT_RESERVED             = 16384,
+    CLIENT_RESERVED2            = 32768,
+    CLIENT_MULTI_STATEMENTS     = (1UL<<16),
+    CLIENT_MULTI_RESULTS        = (1UL<<17),
+    CLIENT_PS_MULTI_RESULTS     = (1UL<<18),
+    CLIENT_PLUGIN_AUTH          = (1UL<<19),
+    CLIENT_CONNECT_ATTRS        = (1UL << 20),
+    CLIENT_PLUGIN_AUTH_LENENC_CLIENT_DATA   = (1UL << 21),
+    CLIENT_CAN_HANDLE_EXPIRED_PASSWORDS     = (1UL << 22),
+    CLIENT_SESSION_TRACK                    = (1UL << 23),
+    CLIENT_DEPRECATE_EOF                    = (1UL << 24),
+    CLIENT_OPTIONAL_RESULTSET_METADATA      = (1UL << 25),
+    CLIENT_ZSTD_COMPRESSION_ALGORITHM       = (1UL << 26),
+    CLIENT_QUERY_ATTRIBUTES                 = (1UL << 27),
+    MULTI_FACTOR_AUTHENTICATION             = (1UL << 28),
+    CLIENT_CAPABILITY_EXTENSION             = (1UL << 29),
+    CLIENT_SSL_VERIFY_SERVER_CERT           = (1UL << 30),
+    CLIENT_REMEMBER_OPTIONS                 = (1UL << 31),
 };
 
 enum class STAGE {
