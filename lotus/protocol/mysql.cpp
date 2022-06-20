@@ -43,14 +43,6 @@ uint64_t read_lenenc_int(buff_t *from){
     return len;
 }
 
-int read_lenenc_str(buff_t *from, char *dst){
-    int len = int(read_lenenc_int(from));
-    char *src=from->data();
-    memcpy(dst, src, len);
-    from->release(len);
-    return len;
-}
-
 int write_lenenc_int(buff_t *to, uint64_t val){
     int flag = 0;
     int bytes = 0;
@@ -70,6 +62,14 @@ int write_lenenc_int(buff_t *to, uint64_t val){
     to->write_le(&flag, 1);
     to->write_le(&val, bytes);
     return 0;
+}
+
+int read_lenenc_str(buff_t *from, char *dst){
+    int len = int(read_lenenc_int(from));
+    char *src=from->data();
+    memcpy(dst, src, len);
+    from->release(len);
+    return len;
 }
 
 int write_lenenc_str(buff_t *to, const char *str, const int len){
@@ -166,15 +166,17 @@ int handshake_request_t::encode(buff_t *to){ //for protocol version 10
     uint16_t capability_flags_2 = (capabilities>>16) & 0xffff;
     to->write_le(&capability_flags_2, 2); //the upper 2 bytes
     if(capabilities & CLIENT_PLUGIN_AUTH){
-        uint8_t auth_plugin_data_len = 20;
+        uint8_t auth_plugin_data_len = 0;
         to->write_le(&auth_plugin_data_len, 1);
     }
     char reserved[10];
     memset(reserved, 0, sizeof(reserved));
     to->append(reserved, 10);
     to->append(rest_of_scramble, 13);
-    const char *auth_plugin_name ="";
-    to->append(auth_plugin_name, 1);
+    if(capabilities & CLIENT_PLUGIN_AUTH){
+        const char *auth_plugin_name ="";
+        to->append(auth_plugin_name, strlen(auth_plugin_name)+1);
+    }
     return to->len();
 }
 
@@ -204,10 +206,12 @@ int handshake_response_t::decode(buff_t *from){
     usr = from->data();
     from->release(strlen(usr));
 
-    int passwd_len = read_lenenc_str(from, passwd);
-    database = from->data();
-    from->release(strlen(database));
-
+    int passwd_len = strlen(from->data());
+    from->read_str(passwd, passwd_len);
+    if(client_flags & CLIENT_CONNECT_WITH_DB){
+        database = from->data();
+        from->release(strlen(database));
+    }
     return 32+strlen(usr)+passwd_len+strlen(database);
 }
 
